@@ -1,0 +1,61 @@
+SSH Primer
+
+Using SSH to get a commandline on a remote *nix server is simple. For *nix clients such as Linux, MacOS, and BSD, OpenSSH is available. For Windows clients, cygwin+openssh and putty are examples of available software clients. For starters, it is recommended to use PuTTY for commandline usage and WinSCP for transferring files.
+
+For *nix (and cygwin+openssh):
+
+  ssh username@remote.machine.hostname
+
+For Windows using PuTTY and WinSCP:
+
+  Fill in the Host Name
+  Fill in your Username
+  Choose SSH as the Connection Type
+  Port should default to 22
+  Connect
+
+For logging into the SEASNet lab machines, please refer to your user account handout for the correct hostname to connect to. The account provides additional information on what the lab machines provide and a small cheat sheat for linux commands.
+
+Advanced SSH Usage
+
+SSH Keys
+
+SSH is an authentication system. By providing credentials, you are identifying yourself. The username/password credentails are the most basic form of authentication and the most vulnerable. The popular alternative to username/password credentails are SSH keys which use public-key cryptography to validate identities. 
+
+SSH keys are split into two files - public key part (key.pub) and private key part (key). The public key part is distributed to all remote machines in which you would use the key as your identity. The private key part is kept securely on your ssh client. Technical details on how this works are available on wikipedia.
+
+Here are the steps to setup an ssh key as your identity for *nix clients:
+
+On the server (yes, you need to have access to the server first):
+
+    mkdir ~/.ssh
+    chmod 700 ~/.ssh
+    touch ~/.ssh/authorized_keys
+    chmod 600 ~/.ssh/authorized_keys
+
+On the client:
+
+    ssh-keygen -t rsa -f ~/.ssh/new.key.name
+    ssh-copy-id ~/.ssh/new.key.name username@remote.machine.hostname
+
+For Windows users and PuTTY, the steps are slightly different.
+
+On the server (yes, you need to have access to the server first):
+
+    mkdir ~/.ssh
+    chmod 700 ~/.ssh
+    touch ~/.ssh/authorized_keys
+    chmod 600 ~/.ssh/authorized_keys
+
+On the client:
+
+    Generate a new ssh key with puttygen
+    Convert the ssh key to the OpenSSh format with puttygen
+    Copy the openssh formatted key to the remote server (via WinSCP or similiar)
+
+On the server:
+
+    cat path.of.ssh.key >> ~/.ssh/authorized_keys
+
+
+Now, instead of typing in your account password, you would type in your ssh key password.
