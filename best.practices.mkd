@@ -1,0 +1,90 @@
+# Formatting Best Practices
+
+Every programming language, community, organization, and programmer has their own styles of programming and have a notion of what they consider "best practices." While everyone has a preference, it is recommended to follow the best practices for languages and organization over community and individual preferences.
+
+Python is very explicit in its convention in [Pep8](http://www.python.org/dev/peps/pep-0008/). Other languages have implicit conventions developed over years of community growth. In general, Pep8 is a pretty good document for code format.
+
+## Commenting and Documentation
+
+All good programmers understand the necessity of commented code and documentation. Comments describe code sections and documentation describes program functionality. These help both the developer and 3rd parties understand what the code is doing and what it is supposed to do. Of course, there is also a different between bad documentation and good documentation.
+
+Here are some guidelines:
+
+  * Document every single function/method 
+  
+  Describe the intent of the function/method, its inputs, outputs, what exceptions may occur and when. Exception: Tiny utility functions in which the function is obvious
+
+  * Document logical sections of code 
+  
+  Logical sections can include logic branching, etc.
+
+  * Document tricky lines of code 
+  
+  If a line of code isn't obvious because you are using tricky language features, do explain what they do
+
+## Variable Naming
+
+While variable names are pretty unrestricted, please use names that describe their functionality. Examples of good variables names that have obvious functionality: temp, row, col, counter, command, args, error. Multi word variables can either be camel case (c, java convention) or separated by _ (python convention).
+
+## Whitespace
+
+In languages such as C++, Java, whitespace typically does not matter in terms of syntax except when some type of whitespace is required. This means a space, tab, newline all act as a whitespace character and are interchangeable when not used in a string/character context. Thus, it becomes a purely aesthetic convention for whitespace usage. The opposite is true for languages such as python where whitespace (instead of braces) are used to define code blocks such as function bodies and if/else bodies. It is important to be aware of the different conventions.
+
+
+### Function/Block definitions
+
+Spacing between parenthesis, commas, braces is different across languages. Just be consistent.
+
+    function(arguments) {
+        // body
+    }
+    
+    function(arguments)
+    {
+        // body
+    }
+    
+    if( expression ) {
+        // body
+    } else {
+        // body
+    }
+    
+    if( expression )
+    {
+        // body
+    } else
+    {
+        // body
+    }
+   
+    if (expression)
+    {
+        // body
+    }
+    else
+    {
+        // body
+    }
+
+### Indentation
+
+Indentation can be made with literal spaces or an actual tab character. What is important here is that the indentation is consistent. Python's [pep8](http://www.python.org/dev/peps/pep-0008/#indentation) specifies 4 spaces for indentation, vertical alignment for continuations, and/or additional indentation to distinguish continuations from regular indentation.
+
+## Line Length
+
+Traditional line length should be limited to 80 characters long. With the advent of GUIs and larger monitor space, this tradition has been lost. However, in general, it is a good idea to keep within the 80 character length to prevent unnecessary window scrolling and scanning. FYI: 80 characters comes from the restriction of old terminals which could only display up to 80 characters per line. This is also a standard size for windowed terminals in \*nix and for text email widths.
+
+## Expressions
+
+In mathematical expression, it is typically more readable to place spaces between operations, numbers, sub-expressions.
+
+Bad spacing:
+
+    1+1
+    (a+b)/3
+
+Good spacing:
+
+    1 + 1
+    (a + b) / 3

@@ -1,0 +1,64 @@
+# \*nix Text Editors (or Vim)
+
+There are several available text editors for \*nix. The typical pre-distributed editors are nano and pico. The most common editors are emacs and vim. While one's editor is all about preference. Since I use vim, I will only give a simple reference for vim. Be wary, vim has a steep learning curve. Refer to `vimtutor` for a more interactive tutorial. It is perhaps much easier to learn from.
+
+So. vim.
+
+## Modes
+
+The most different feature of vim are modes. They are: command/normal mode, insert mode, visual mode, replace mode. Command mode interprets all keyboard input as vim commands. Insert mode interprets all keyboard input as literal characters to insert into the text file. Visual mode gives an alternate way of editting code. Replace mode allows you to continually replace text.
+
+When vim starts up, vim by default initializes in command mode. To switch to insert mode, type `i` and you will notice a `-- INSERT --` at the bottom of the screen. To switch back to command mode, press `esc` and the insert will go away. From command mode, `^V` takes you to visual mode and you will see `-- VISUAL MODE --`.
+
+### Command/Normal Mode
+
+In command mode, you can open, save, quit vim.
+
+    :w <filename>      Writes ("saves") the file to disc given filename (if ommitted, current filename)
+    :o filename        Opens filename
+    :q                 Quit vim
+    :q!                Quit vim discarding changes
+    :wq                Save file and quit
+    ZZ                 Save file and quit
+
+Additionally, cursor movement occurs in command mode using hjkl and cursor keys.
+
+Some more advanced cursor movements:
+
+    ^B                 Page up
+    ^F                 Page down
+
+You can also search text:
+
+    /pattern           forward search pattern
+    ?pattern           backward search pattern
+    n                  repeat last search
+
+You delete in command mode:
+
+    x                  Delete under cursor
+    DD                 Delete line
+    dw                 Delete word beginning at cursor
+    d$                 Delete to end of line
+
+You can enter insert mode with some special starting locations:
+
+    A                  Append mode. Enter insert mode with the cursor at the end of the line.
+
+Undo/Redo
+
+    u                  Undo 
+    ^R                 Redo
+
+Replace
+
+    rx                 Replace current character at cursor with character x
+    R                  Enter replace mode.
+
+### Insert Mode
+
+This is the most familiar mode to users. In addition to regular typing, vim also provides additional commands for text manipulation.
+
+    ^W                 Delete last word
+    ^T                 Indent
+    ^H                 De-indent

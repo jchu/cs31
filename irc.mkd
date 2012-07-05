@@ -1,0 +1,65 @@
+# IRC - Internet Relay Chat
+
+[IRC](http://en.wikipedia.org/wiki/Internet_Relay_Chat) is a chat protocol. The protocol allows for chat rooms (called "channels") and private messages. This protocol is often used by developers, gamers, and niche communities.
+
+For this class, it can be used to talk with a TA and other students.
+
+The following are some IRC clients.
+
+## mibbit (web browser)
+
+[mibbit](chat.mibbit.com) is a javascript web client.
+
+Connect to the server by clicking on server and filling in `irc.caffeinatedcode.com+61697`. Choose a nick and the channel `#cs31`. Chat away.
+
+## irssi (\*nix)
+
+irssi is a \*nix text-only IRC client. The basic interface is simple.
+
+    /server [options] hostname [port]
+
+Connect to the server at hostname and port. For example,
+
+    /server -ssl irc.caffeinatedcode.com 61697
+
+This connects to the irc server irc.caffeinatedcode.com on port 61697 with an ssl enabled.
+
+After connecting, simply join a channel:
+
+    /join #channelname
+
+To see who is connected to the channel
+
+    /names
+
+To private message someone
+
+    /msg nick message
+
+If you follow the guide and use advanced\_windowlist, you will notice there are many windows open with numbers/tters next to them. You can jump to a window with `alt-X` where `X` is the channel designation. A window is associated with each chatroom and private conversation.
+
+To exit irssi
+
+    /exit
+
+Follow this guide for more details: [A Guide to Efficiently Using Irssi and Screen](http://quadpoint.org/articles/irssi/)
+
+## mIRC (windows)
+
+[mIRC](http://www.mirc.com/) is a Windows IRC client. You need to configure the client before connecting.
+
+  * Connect
+    * Full Name
+    * Email Address
+    * Nickname
+  * Servers
+    * Description
+    * IRC Server (irc.caffeinatedcode.com)
+    * Ports (61697)
+    * Select
+
+## mac clients
+
+  * [colloquy](http://colloquy.info/)
+  * [Opera](http://help.opera.com/Linux/10.63/en/chat.html)
+  * [XChat](http://xchat.org/)
