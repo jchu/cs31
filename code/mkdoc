@@ -1,0 +1,106 @@
+#!/usr/bin/perl
+
+#   cd <g3 book>; ./mkdoc       # --> creates *.html in html branch
+
+my $MKD = "./Markdown.pl";
+
+use 5.10.0;
+use strict;
+use warnings;
+
+main();
+
+sub main {
+    chomp(@ARGV = `find . -maxdepth 1 -name "*.mkd" | cut -c3-`) if not @ARGV;
+    @ARGV = grep { /./ } @ARGV;
+    my @save = @ARGV;
+    my $css_block = join("", <DATA>);
+
+    my %ct; # chapter tocs
+    my %title;
+    my $mf = '';
+    my $fh;
+
+    while (<>) {
+        $ARGV =~ /^(?:.*\/)?([^\/]+)\.mkd$/;
+        my $b = $1;
+
+        if (/^(#+) (?:#(\S+) )?(.*)/) {
+            $title{$b} ||= $3;
+            if ( length($1) == 1 ) {
+                $ct{$b} .= "\n";
+                $ct{$b} .= "  * [$3][$b]\n";
+                $mf .= "[$b]: $b.html\n";
+            } else {
+                $ct{$b} .= " " x ( 4 * ( length($1) - 1 ) );
+                $ct{$b} .= "  * ";
+                $ct{$b} .= (
+                    $2
+                    ? "[$3][$2]"
+                    : "$3"
+                );
+                $ct{$b} .= "\n";
+                $mf .= "[$2]: $b.html" . ($2 ne $b ? "#$2" : "") . "\n" if $2;
+            }
+        }
+    }
+
+    for my $mkd (@save) {
+        $mkd =~ /^(?:.*\/)?([^\/]+)\.mkd$/;
+        my $b = $1;
+
+        my $css = $css_block;
+        $css =~ s/%TITLE/$title{$b} || $b/e;
+
+        open($fh, ">", "$b.html")
+          and print $fh $css
+          and close $fh;
+
+        my $mkt = `cat $mkd`;
+        $mkt =~ s/^(#+) #(\S+) /$1 <a name="$2"><\/a> /mg;
+        $mkt =~ s/^\[\[TOC\]\]/$ct{$b}/mg;
+        open($fh, "|-", "$MKD >> $b.html")
+          and print $fh $mkt, "\n\n", $mf
+          and close $fh;
+
+        open($fh, ">>", "$b.html")
+            and print $fh <<CODE
+        <script>
+            SyntaxHighlighter.all();
+        </script>
+    </body>
+</html>
+CODE
+            and close $fh;
+    }
+}
+
+__DATA__
+
+
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <title>%TITLE</title>
+        <meta name="author" content="Jonathan Chu" />
+        <meta name="description" content="CS31 TA Webpage" />
+        <meta charset="utf-8" />
+        <style>
+    body        { background: #fff; text-color: #000; margin-left:  40px;   font-size:  0.9em;  font-family: sans-serif; max-width: 800px; }
+    h1          { background: #ffb; text-color: #000; margin-left: -30px;   border-top:    5px  solid #ccc; }
+    h2          { background: #ffb; text-color: #000; margin-left: -20px;   border-top:    3px  solid #ddd; }
+    h3          { background: #ffb; text-color: #000; margin-left: -10px; }
+    h4          { background: #ffb; text-color: #000; }
+    code        { font-size:    1.1em;  background:  #ddf; text-color: #000; }
+    pre         { margin-left:  2em;    background:  #ddf; text-color: #000; }
+        </style>
+        <link href="css/shCore.css" rel="stylesheet" type="text/css" />
+        <link href="css/shThemeDefault.css" rel="stylesheet" type="text/css" />
+        <script src="js/shCore.js"></script>
+        <script src="js/shBrushCpp.js"></script>
+    </head>
+<body>
+
+<p style="text-align:center">
+    <a href="index.html">Back to Index</a>
+</p>
