@@ -14,7 +14,7 @@ For Windows using PuTTY and WinSCP:
   * Port should default to 22
   * Connect
 
-For logging into the SEASNet lab machines, please refer to your user account handout for the correct hostname to connect to. The account provides additional information on what the lab machines provide and a small cheat sheat for linux commands.
+For logging into the SEASNet lab machines, in order to run g++, you will be connecting to `lnxsrv.seas.ucla.edu`. See [g++ on linux](http://www.cs.ucla.edu/classes/summer12/cs31/linux.html) for detailed setup information. The account form provides additional information on what the lab machines provide and a small cheat sheat for linux commands.
 
 ## Advanced SSH Usage
 
