@@ -1,0 +1,341 @@
+# Basics
+
+[[TOC]]
+
+## #stdstruct Standard Program Structure
+
+(standard for now)
+
+    #include <iostream>
+    using namespace std;
+
+    int main() {
+        // body
+        return 0;
+    }
+
+Line 1 is
+
+    #include <iostream>
+
+This means "include" the library `iostream`. The `iostream` library, input/output stream, gives the program the functions to access and manipulate input and output. In particular, it gives the program the ability to use `cin` and `cout`, "console in and console out." `cout` is used to print to the console while `cin` is used to take input from the console.
+
+Line 2 is
+
+    using namespace std;
+
+This "imports" the `std` namespace. `std` is the standard namespace in which many core variables and functions reside. this line allows us to write `cout` and `cin` instead of `std.cout` and `std.cin`. When you type `std.cout`, this "qualifies" the `cout` function in the `std` namespace. This will be used when you haven't imported the namespace, functions, variables, or when the same name appears in multiple namespace.
+
+Lines 3-6 are
+
+    int main() {
+        // body
+        return 0;
+    }
+
+This is the definition of the `main` function. The `main` function is required for any standalone executable program. It is the initial function that is run when a program is executed. `// body` is a comment that signifies a placeholder for the code that would belong in the `main` function. You will often see this when prototyping functions and statements.
+
+`return 0;` is the statement that returns the value 0 upon exiting the `main` function. All functions have a return type as part of their definition. `main`'s return type is always `int`. The return value of `main` is also the exit code of the executable. Typically, `0` is an indication of no errors while a non-zero value corresponds to an error.
+
+The majority of your initial programs will follow this basic framework. It has the ability to print out to the console and read user input.
+
+## #math Arithmetic
+
+Arithmetic follows the general precedence rules as the standard order of operations, [PEMDAS](http://en.wikipedia.org/wiki/Order_of_operations) and in Chapter 2 Flow of Control in Absolute C++. However, the actual result of arithmetic expressions depends on the types of the values used in the expressions.
+
+### Integer Arithmetic
+
+Integers are all whole numbers.
+
+    int i = 0;  // i has value 0
+    i = i + 1;  // i has value 1
+    i += 2;     // i has value 3 (equivalent to i = i + 2)
+    i++;        // i has value 4 (equivalent to i = i + 1)
+    i = i - 1;  // i has value 3
+    i -= 2;     // i has value 1 (equivalent to i = i - 2)
+    i--;        // i has value 0 (equivalent to i = i - 1)
+    i = i * 5;  // i has value 5
+    i *= 2;     // i has value 10 (equivalent to i = i * 2)
+    i = i / 5;  // i has value 2
+    i /= 2;     // i has value 1 (equivalent to i = i / 2)
+    i = i % 2;  // i has value 1 (% is the modulus/remainder operator)
+    i %= 1;     // i has value 0 (% is the modulus/remainder operator)
+    i += 9;     // i has value 9
+    i /= 5;     // i has value 1 (integer division truncates to whole integer)
+
+Integer arithmetic is just like regular math, except for division. Because the variable the resulting value of the operation is an integer, the result is truncated to fit an integer.
+
+### Double/Floating Point Arithmetic
+
+Doubles and floating points are numbers that can include fractional values. However, due to the limitations of number representation in computers, they have precisions. Doubles have precision to 15 digits while floats have precision to 7 digits.
+
+Literal numbers default to double types. 
+
+    double i = 9;   // i has value 9.0 
+    i /= 5;         // i has a value of 1.8
+
+If you mix integers and doubles or floats in an expression, the integer is `casted` into the other type in order to perform the calculation. However, the resulting value still depends on what type the result is stored into.
+
+    int i = 5;
+    double j = 9;
+
+    int iresult = j / i;    // iresult has value 1
+    double dresult = j / i; // deresult has value 1.8
+
+## #flow Flow Control
+
+The standard flow of program execution is top down. There are several ways to alter the standard flow through flow control statements. All these statements change the flow based on logical decisions.
+
+### if/else
+
+An `if` statement evaluates a condition in order to determine if a body of code should be executed.
+
+    if( condition ) {
+        // body (executed only if condition is true
+    }
+
+For example:
+
+    int age;
+    cout << "Age? ";
+    cin >> age;
+    if( age < 18 ) {
+        cout << "You are a minor." << endl;
+    }
+    cout << "Your age is: " << age << endl;
+
+Outputs:
+
+    Age? 12
+    You are a minor.
+    Your age is: 12
+
+or
+
+    Age? 18
+    Your age is: 18
+
+An `else` statement can be attached to an `if` statement to be executed when the condition is false
+
+    if( condition ) {
+        // body (executed only if condition is true
+    } else {
+        // body (executed only if condition is false
+    }
+
+For example:
+    
+    int age;
+    cout << "Age? ";
+    cin >> age;
+    if( age < 18 ) {
+        cout << "You are a minor." << endl;
+    } else {
+        cout << "You are an adult." << endl;
+    }
+    cout << "Your age is: " << age << endl;
+
+Outputs:
+
+    Age? 12
+    You are a minor.
+    Your age is: 12
+
+or
+
+    Age? 18
+    You are an adult.
+    Your age is: 18
+
+A number of `if` statements can be combined, but only one else statement can be used.
+
+    if( condition0 ) {
+        // body (executed only if condition0 is true
+    } else if( condition1 ) {
+        // body (executed only if condition1 is true
+    } else if( condition2 ) {
+        // body (executed only if condition2 is true
+    } else {
+        // body (executed only if all conditions are false
+    }
+
+For example:
+    
+    int age;
+    cout << "Age? ";
+    cin >> age;
+    if( age < 18 ) {
+        cout << "You are a minor." << endl;
+    } else if( age < 21 ) {
+        cout << "You are an adult. You can legally smoke." << endl;
+    } else {
+        cout << "You are an adult. " << endl
+        << "You can legally smoke." << endl
+        << "You can legally drink. << endl;
+    }
+    cout << "Your age is: " << age << endl;
+
+Outputs:
+
+    Age? 12
+    You are a minor.
+    Your age is: 12
+
+or
+
+    Age? 18
+    You are an adult.
+    You can legally smoke.
+    Your age is: 18
+
+or
+
+    Age? 21
+    You are an adult.
+    You can legally smoke.
+    You can legally drink.
+    Your age is: 21
+
+### Boolean Expressions
+
+Boolean expressions are expressions that evaluate to true or false. These expressions make use of the relational operators `&&`, `||`, `>`, `<`, `<=`, `>=`, '!=`, '!'.
+
+### while
+
+A `while` loop continues executing a block of code while the condition is true.
+
+    while( condition ) {
+        // body (executed if condition is true)
+    }
+
+For example:
+
+    int i = 10;
+    while( i > 0 ) {
+        cout << i << endl;
+        i--;
+    }
+
+Outputs
+
+    10
+    9
+    8
+    7
+    6
+    5
+    4
+    3
+    2
+    1
+
+### for loop
+
+Some forms of the `while` are so common, they fall into the category of the `for` loop. In actually, all `for` loops have an equivalent `while` loop. Thus, it is said that a `for` loop is just syntantic sugar.
+
+    for( initialization; condition; update ) {
+        // body
+    }
+
+The `initialization` section allows for the initialization of the `control variable`. The variable is used in the `condition` section which determines whether the body of the `for` should be executed (just like `while`). Often, this variable is only used in the `for` loop and thus, also declared in the initalization step. Note, the scope of the declaration is only within the `for` statement itself (both whats between the `()` and in the body. The `update` section is executed at the end of each loop before the condition is re-evaluated.
+
+Take the previous `while` loop example that counts from 10 to 1. The equivalent `for` loop would be:
+
+    for( int i = 10; i > 0; i-- ) {
+        cout << i << endl;
+    }
+
+All sections of the for loop (`initialization`, `condition`, `update`) are actually optional. If the initialization section is empty, nothing happens before the `for` loop first evaluates the condition. If the update section is empty, nothing happens after each loop is complete. When the condition is empty, it defaults to the `true` value. Thus, both:
+
+    while( true ) {
+        // body
+    }
+
+and
+
+    for(;;) {
+        // body
+    }
+
+are equivalent and will infinitely loop.
+
+
+### nested control flow statements
+
+All control flow statements are valid where a `// body` is indicated. Thus, you can `nest` these statements (place them inside the body of other statements).
+
+For example,
+
+    for( int i = 0; i < 3; i++ ) {
+        for( int j = 0; j < i; j++ ) {
+            cout << "*" << endl;
+        }
+        cout << endl;
+    }
+
+outputs:
+
+    *
+    **
+    ***
+
+Notice that the condition of the second `for` loop is dependent on the declared variable of the first `for` loop. This is possible because the second `for` loop is within the scope of the first `for` loop and thus `i` is a valid variable.
+
+### switch statements
+
+`switch` statements allow for the comparison of multiple possible values for an expression. Note: the expression is limited to have a return value of a `bool`, an `enum`, an `int`, or a `char`. And as a result, you can only compare the value of the expression against constant expressions as well (no variables can be used).
+
+    switch( expression ) {
+        case constant0:
+            // body (executed if expression evaluates to constant0)
+            break;
+        case constant1:
+            // body (executed if expression evaluates to constant1)
+            break;
+        default:
+            // body (executed if expression does not evaluate to any of the constants)
+            break;
+    }
+
+There can be any number of `case` statements and the `default` case can be omitted.
+
+For example:
+
+    int cents;
+    cout << "Value of coin in pennies? ";
+    cin >> cents;
+
+    switch( cents ) {
+        case 1:
+            cout << "You have a penny." << endl;
+            break;
+        case 5:
+            cout << "You have a nickel." << endl;
+            break;
+        case 10:
+            cout << "You have a dime." << endl;
+            break;
+        case 25:
+            cout << "You have a quarter." << endl;
+            break;
+        default:
+            cout << "Not a single coin value." << endl;
+            break;
+    }
+
+Outputs:
+
+    Value of coin in pennies? 1
+    You have a penny.
+
+or
+
+    Value of coin in pennies? 25
+    You have a quarter.
+
+or
+
+    Value of coin in pennies? 9001
+    Not a single coin value.
+
+Note the use of the keyword `break` in each case. This prevents the code from `fallthrough`. `switch` cases are not like the `if/else if/else` statements. The condition is evaluated only once, and the code following that case statement is executed. Thus, if no `break` statement is found, the code will continue executing the next `case` until either a `break` statement is reached or the `switch` statement is complete.

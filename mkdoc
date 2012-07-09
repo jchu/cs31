@@ -11,7 +11,7 @@ use warnings;
 main();
 
 sub main {
-    chomp(@ARGV = `find . -name "*.mkd" | cut -c3-`) if not @ARGV;
+    chomp(@ARGV = `find . -maxdepth 1 -name "*.mkd" | cut -c3-`) if not @ARGV;
     @ARGV = grep { /./ } @ARGV;
     my @save = @ARGV;
     my $css_block = join("", <DATA>);
@@ -66,6 +66,8 @@ sub main {
         open($fh, ">>", "$b.html")
             and print $fh "\n</body>\n</html>"
             and close $fh;
+
+        print "Generated $b.html\n";
     }
 }
 

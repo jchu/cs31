@@ -72,6 +72,8 @@ sub main {
 </html>
 CODE
             and close $fh;
+
+        print "Generated $b.html\n";
     }
 }
 
@@ -102,5 +104,5 @@ __DATA__
 <body>
 
 <p style="text-align:center">
-    <a href="index.html">Back to Index</a>
+    <a href="../index.html">Back to Index</a>
 </p>
