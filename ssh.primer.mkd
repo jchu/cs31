@@ -1,10 +1,16 @@
-# SSH Primer
+# SSH Primer (and SCP)
 
 Using SSH to get a commandline on a remote *nix server is simple. For *nix clients such as Linux, MacOS, and BSD, OpenSSH is available. For Windows clients, cygwin+openssh and putty are examples of available software clients. For starters, it is recommended to use PuTTY for commandline usage and WinSCP for transferring files.
 
-For nix (and cygwin+openssh):
+For \*nix (and cygwin+openssh):
 
     ssh username@remote.machine.hostname
+
+To transfer files, use `SCP`:
+
+    scp path_to_local_file username@remote.machine.hostname:
+
+Note the `:` at the send of the second argument. That tells `scp` where to place the file relative to your home directory. See [linux cli](./linux.cli.html) for how to navigate the command line.
 
 For Windows using PuTTY and WinSCP:
 
