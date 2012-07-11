@@ -3,6 +3,7 @@
 #   cd <g3 book>; ./mkdoc       # --> creates *.html in html branch
 
 my $MKD = "./Markdown.pl";
+my $PP = "./post.process.pl";
 
 use 5.10.0;
 use strict;
@@ -59,7 +60,7 @@ sub main {
         my $mkt = `cat $mkd`;
         $mkt =~ s/^(#+) #(\S+) /$1 <a name="$2"><\/a> /mg;
         $mkt =~ s/^\[\[TOC\]\]/$ct{$b}/mg;
-        open($fh, "|-", "$MKD >> $b.html")
+        open($fh, "|-", "$MKD | $PP >> $b.html")
           and print $fh $mkt, "\n\n", $mf
           and close $fh;
 
