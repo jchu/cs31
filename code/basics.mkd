@@ -82,11 +82,24 @@ If you mix integers and doubles or floats in an expression, the integer is `cast
     int iresult = j / i;    // iresult has value 1
     double dresult = j / i; // deresult has value 1.8
 
+Conversion table for `var0 / var1`:
+
+    .aa
+
+    var0    | var1    |result
+    -------------------------
+    int     | int     |int (truncated)
+    int     | double  |double
+    double  | int     |double
+    double  | double  |double
+
+Again, the final stored type of the result depends on the type of the variable it is stored in.
+
 ## #flow Flow Control
 
 The standard flow of program execution is top down. There are several ways to alter the standard flow through flow control statements. All these statements change the flow based on logical decisions.
 
-### if/else
+### `if/else`
 
 An `if` statement evaluates a condition in order to determine if a body of code should be executed.
 
@@ -196,11 +209,63 @@ or
     You can legally drink.
     Your age is: 21
 
+#### Graphical Execution of `if/else`
+
+##### `if` only
+
+code:
+
+    if( condition ) {
+        // if body
+    }
+
+execution:
+
+    .gv
+    [] [y] enter
+    [] [g] if
+    <> [r] "<condition>"
+    [o] "// if body"
+    [] [y] exit
+    enter .. if
+    if .. "<condition>"
+    "<condition>" .. "// if body" [ [true], taillabel = "condition is true", labeldistance=7, labelangle=-60 ]
+    "<condition>" .. exit [ [false], taillabel = "condition is false", labeldistance=6, labelangle=65 ]
+    "// if body" .. exit
+
+##### `if/else`
+
+code:
+
+    if( condition ) {
+        // if body
+    } else {
+        // else body
+    }
+
+execution:
+
+    .gv
+    [] [y] enter
+    [] [g] if
+    <> [r] "<condition>"
+    [o] "// if body"
+    [] [g] else
+    [o] "// else body"
+    [] [y] exit
+    enter .. if
+    if .. "<condition>"
+    "<condition>" .. "// if body" [ [true], taillabel = "condition is true", labeldistance=6, labelangle=-65 ]
+    "<condition>" .. else [ [false], taillabel = "condition is false", labeldistance=6, labelangle=55 ]
+    "// if body" .. exit
+    else .. "// else body"
+    "// else body" .. exit
+
 ### Boolean Expressions
 
 Boolean expressions are expressions that evaluate to true or false. These expressions make use of the relational operators `&&`, `||`, `>`, `<`, `<=`, `>=`, '!=`, '!'.
 
-### while
+### `while` loop
 
 A `while` loop continues executing a block of code while the condition is true.
 
@@ -229,7 +294,30 @@ Outputs
     2
     1
 
-### for loop
+#### Graphical execution of `while`
+
+code:
+
+    while( condition ) {
+        // while body
+    }
+
+execution:
+
+    .gv
+    [] [y] enter
+    [] [g] while
+    <> [r] "<condition>"
+    [o] "// while body"
+    [] [y] exit
+    enter .. while
+    while .. "<condition>"
+    "<condition>" .. "// while body" [ [true], taillabel = "condition is true", labeldistance=6, labelangle=-75 ]
+    "<condition>" .. exit [ [false], taillabel = "condition is false", labeldistance=8, labelangle=40 ]
+    "// while body" .. "<condition>"
+    .ie  exit .. "// while body"
+
+### `for` loop
 
 Some forms of the `while` are so common, they fall into the category of the `for` loop. In actually, all `for` loops have an equivalent `while` loop. Thus, it is said that a `for` loop is just syntantic sugar.
 
@@ -259,6 +347,32 @@ and
 
 are equivalent and will infinitely loop.
 
+#### Graphical execution of `for`
+
+code:
+
+    for( initialization; condition; update ) {
+        // for body
+    }
+
+execution:
+
+    .gv
+    [] [y] enter
+    [] [g] for
+    <> [m] initialization
+    <> [r] "<condition>"
+    <> [m] update
+    [o] "// for body"
+    [] [y] exit
+    enter .. for
+    for .. initialization
+    initialization .. "<condition>"
+    "<condition>" .. "// for body" [ [true], taillabel = "condition is true", labeldistance=2, labelangle=15 ]
+    "<condition>" .. exit [ [false], taillabel = "condition is false", labeldistance=6, labelangle=40 ]
+    "// for body" .. update
+    update .. "<condition>"
+    .ie  "// for body" .. exit
 
 ### nested control flow statements
 
@@ -280,6 +394,39 @@ outputs:
     ***
 
 Notice that the condition of the second `for` loop is dependent on the declared variable of the first `for` loop. This is possible because the second `for` loop is within the scope of the first `for` loop and thus `i` is a valid variable.
+
+execution:
+
+    .gv
+    [] [y] enter
+    [] [g] "for (outer)"
+    <> [m] "int i = 0"
+    <> [r] "i < 3"
+    <> [m] "i++"
+    [] [g] "for (inner)"
+    <> [m] "int j = 0"
+    <> [r] "j < i"
+    <> [m] "j++"
+    [o] "cout << \"*\" << endl;"
+    [o] "cout << endl;"
+    [] [y] exit
+
+    enter .. "for (outer)"
+    "for (outer)" .. "int i = 0"
+    "int i = 0" .. "i < 3"
+    "i < 3" .. "for (inner)" [ [true], taillabel = "(i < 3) is true", labeldistance=5, labelangle=-35 ]
+    "i < 3" .. exit [ [false], taillabel = "(i < 3) is false", labeldistance=2, labelangle=10 ]
+    "i++" .. "i < 3"
+
+    "for (inner)" .. "int j = 0"
+    "int j = 0" .. "j < i"
+    "j < i" .. "cout << \"*\" << endl;" [ [true], taillabel = "(j < i) is true", labeldistance=2, labelangle=15 ]
+    "cout << \"*\" << endl;" .. "j++"
+    "j++" .. "j < i"
+    "j < i" .. "cout << endl;" [ [false], taillabel = "(j < i) is false", labeldistance=6, labelangle=20 ]
+    "cout << endl;" .. "i++"
+
+    .ie "cout << \"*\" << endl;" .. "cout << endl;"
 
 ### switch statements
 
@@ -339,3 +486,100 @@ or
     Not a single coin value.
 
 Note the use of the keyword `break` in each case. This prevents the code from `fallthrough`. `switch` cases are not like the `if/else if/else` statements. The condition is evaluated only once, and the code following that case statement is executed. Thus, if no `break` statement is found, the code will continue executing the next `case` until either a `break` statement is reached or the `switch` statement is complete.
+
+#### Graphical execution of `switch`
+
+code with breaks:
+
+    switch( expression ) {
+        case constant0:
+            // constant0 body
+            break;
+        case constant1:
+            // constant1 body
+            break;
+        default:
+            // default body
+            break;
+    }
+
+execution:
+
+    .gv
+    [] [y] enter
+    [] [g] switch
+    <> [m] expression
+    [] [g] "case constant0"
+    [] [g] "case constant1"
+    [] [g] default
+    [o] "// constant0 body"
+    [o] "// constant1 body"
+    [o] "// default body"
+    [o] break0 [label="break"]
+    [o] break1 [label="break"]
+    [o] break2 [label="break"]
+    [] [y] exit
+
+    enter .. switch
+    switch .. expression
+    expression .. "case constant0" [ [true], label = "(expression == constant0) is true", labeldistance=5, labelangle=-35 ]
+    expression .. "case constant1" [ [true], label = "(expression == constant1) is true", labeldistance=5, labelangle=-35 ]
+    expression .. default[ [false], label = "No cases are true", labeldistance=2, labelangle=10 ]
+    "case constant0" .. "// constant0 body"
+    "// constant0 body" .. break0
+    "case constant1" .. "// constant1 body"
+    "// constant1 body" .. break1
+    default .. "// default body"
+    "// default body" .. break2
+    break0 .. exit
+    break1 .. exit
+    break2 .. exit
+
+    break0 -- "// constant1 body"
+    break1 -- "// default body"
+
+Note: The dotted lines represent the layout of the actual code during execution. However, because `break` statements are `goto` statements, they jump to the exit rather than continue. This is more obvious with the next example.
+
+code with 1 break:
+
+    switch( expression ) {
+        case constant0:
+            // constant0 body
+        case constant1:
+            // constant1 body
+            break;
+        default:
+            // default body
+    }
+
+execution:
+
+    .gv
+    [] [y] enter
+    [] [g] switch
+    <> [m] expression
+    [] [g] "case constant0"
+    [] [g] "case constant1"
+    [] [g] default
+    [o] "// constant0 body"
+    [o] "// constant1 body"
+    [o] "// default body"
+    [o] break
+    [] [y] exit
+
+    enter .. switch
+    switch .. expression
+    expression .. "case constant0" [ [true], label = "(expression == constant0) is true", labeldistance=5, labelangle=-35 ]
+    expression .. "case constant1" [ [true], label = "(expression == constant1) is true", labeldistance=5, labelangle=-35 ]
+    expression .. default[ [false], label = "No cases are true", labeldistance=2, labelangle=10 ]
+    "case constant0" .. "// constant0 body"
+    "// constant0 body" .. "// constant1 body"
+    "case constant1" .. "// constant1 body"
+    "// constant1 body" .. break
+    default .. "// default body"
+    "// default body" .. exit
+    break .. exit
+
+    break -- "// default body"
+
+Because the body of constant0 doesn't have a `break`, it continues to the body of constant1.
