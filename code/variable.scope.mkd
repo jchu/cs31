@@ -1,0 +1,73 @@
+# Variable Scopes
+
+[[TOC]]
+
+Scopes define where variables are defined and accessible at any point in a program. When a variable is declared, it creates a space in memory that is reserved for the value of that variable. This space is then referenced by the variable name.
+
+## Scopes
+
+Variables are always declared in some scope. Variables cannot be declared twice within the same scope. When variables are declared in different scopes, the most restrictive scope is used when evaluating a variable.
+
+### Global Scope
+
+The `global` scope is the largest scope. It encompasses the entire program. Anything declared in the `global` scope is available anymore in the program. It is common to use constant values in the `global` scope if it applicable to the entire program.
+
+### Block Scope
+
+A `block` is a section of code denoted by `{}`. This includes function, control flow statements, and `{}` code. This is more often termed as the `local` scope when refering to functions and `condition` scope when referring to control flow statements. Variables declared within a block are available only inside the block. This also includes variables declared as part of the statement denoting that block (function parameters, for loop initialization/declaration section).
+
+## #example Example
+
+
+    #include <iostream>
+    using namespace std;
+    
+    int subtract(int a, int b);
+    int global = 5; // global scope
+    
+    int main() {
+        int a, b; // local scope
+        a = 5;
+        b = 3;
+    
+        // a = 5
+        // b = 3
+        // global = 5
+        global = 2 + subtract(a, b);
+        // a = 5
+        // b = 3
+        // global = 9
+        swap(a, b);
+        // a = 3
+        // b = 5
+        
+        for(int a = 0; a < 2; a++ ) { // local to for
+            // a = 0, 1
+        }
+        // a = 3
+        while(true) {
+            int a = 0; // local to while
+            break;
+        }
+        // a = 3
+        for(a = 0; a < 2; a++ ) { // using main local a
+            // a = 0, 1
+        }
+        // a = 2
+        
+        return 0;
+    }
+    
+    int subtract(int a, int b) {
+        // a = 5
+        // b = 3
+        a = a - b + global; // local scope
+        // a = 9
+        return a;
+    }
+    
+    void swap(int& a, int& b) {
+        a ^= b; // local but call by reference
+        b ^= a;
+        a ^= b;
+    }
