@@ -1,0 +1,369 @@
+# Functions
+
+[[TOC]]
+
+Functions encompass a block of code under a name. A function declaration describes what that block of code (by name) and how to interact with it.
+
+## #syntax Basic Syntax
+
+    return_type function_name(param_type0 param_name0, param_type1 param_name1, ...) {
+        // function body
+    }
+
+`function_name` is the name of the function. It should clearly indicate what the function does. For example, `max` will find the maximum of two numbers. `rand` will find the next random number, `swap` swaps two variables, `getopt' gets options submitted by the user.
+
+`param_type0 param_name0, param_type1 param_name1, ...` is a list of parameters to the function. Parameters indicate values that you can pass into the function for use inside the function. For example, `max(int a, int b)` shows that you must give `max` two integer variables, `rand()` means `rand` takes in no parameters, `swap(int a, int b)` means swap takes in two integer variables. The variable names indicated in the parameter list are automatically initialized to the arguments to the function. There are several details about this that will be discussed later.
+
+`return_type` indicates the type of the value that results from calling the function. `int max(int a, int b)` takes the maximum of the two integer parameters and returns an integer, `int rand()` takes in no parameters and returns some integer.
+
+The most pervasive function is the `main` function declared and defined as:
+
+    int main() {}
+
+The `main` function takes in no arguments and returns an integer. The integer return value indicates the success or failure of the program (this value is interpreted by other programs).
+
+## #usage Basic Usage
+
+When functions are used, it is referred to as `calling the function`. A function call looks like:
+
+    function_name(arguments)
+
+The call must match the declaration of the function. For example, given this declaration and definition for `rand`:
+
+    int rand() {
+        // body
+    }
+
+it is called like:
+
+    int a = rand();
+    if( rand() > 5 ) {
+        // do something
+    }
+    int b = rand() + 1;
+
+Notice how it appears in the same places a normal variable would be found. Like a variable, the function is evaluated for its return value.
+
+If the function has parameters, such as `max`:
+
+    int max(int a, int b) {
+        // body
+    }
+
+it is called with `arguments`:
+
+    int a = max(1, 2);
+    int b = max(3, a);
+    int c = max(a, b);
+    int d = max(1 + 1, max(1, 2));
+
+As you can see, the arguments must match the parameter list. Furthermore, as long as the arguments evaluate to the expected parameter type, constants, expression, and even function calls are valid.
+
+## Variations to Syntax
+
+### #defaults Default Values
+
+In some cases, it makes sense to make some parameters optional by assigning default values. If these parameters are not passed in, then they take on the default values.
+
+Example:
+
+     /*
+      * drawBox
+      *
+      * Draw a box with upper left corner at (xpos, ypos)
+      * with specified width and height
+      */
+    void drawBox(int xpos, int ypos, int width = 5, int height = 5) {
+        // body
+    }
+
+The `drawBox` function draws a box to the screen. This might be used in some kind of drawing program. The default values for width and height are given, so that if the user just wants a box, they can draw one without specifying a width and height. This program can be called in multiple ways:
+
+    drawBox(0, 0); // use default values for width and height
+    drawBox(0, 0, 3); // use default value for height
+    drawBox(0, 0, 1, 5); // explicitly use given width and height
+
+Finally, note that default values can only be at the end of the parameter list because parameter order is important.
+
+    void drawBox(int width = 5, int height = 5, int xpos, int ypos);
+
+would not work.
+
+### #param Call-by-Value, Call-by-Reference
+
+There are two methods to bind values to the parameter variables known as `call-by-value` and `call-by-reference`.
+
+`call-by-value` evaluates the value of the argument passed into the function and assigns the value to the declared variable. Thus, the argument and the parameter are completely separated.
+
+    int increment(int a) {
+        a++; // a = a +1
+        return a;
+    }
+
+    int main() {
+        int a = 0;
+        int b = increment(a);
+        // b has value 1, a still has value 0
+    }
+
+`call-by-reference` binds the parameter variable to the argument variable. This means the same memory that holds the value of the argument variable is also referenced by the parameter variable. Thus, if the parameter variable is changed within the function, the original argument variable will see the changed value.
+
+    void swap(int& a, int& b) {
+        int temp = a;
+        a = b;
+        b = temp;
+    }
+
+    int a = 1;
+    int b = 2;
+    swap(a, b);
+    // a has value 2, b has value 1
+
+Most of the time, `call-by-value` parameters are used. Functions that use `call-by-value` tend to either execute algorithms or perform small independent tasks.  `call-by-reference` is often used to modify the state of the program with `side-effects`, persistent changes that live beyond the life of the function call. `call-by-reference` functions will be seen more often when parameters are pointers (discussed later).
+
+## #syntax2 Declaration and Definition
+
+Just like variables, functions have a declaration and definition. The declaration of a function is the header of the function (`return_type function_name(parameter_list)`) and the definition is the body pf the function between the `{}`. And, just like variables, you just have a declaration before the function can be referenced and they must be defined by the time the function is executed during the run-time execution.
+
+Declaration and Definition together:
+
+    void hello_world(string author = "anonymous") {
+        cout << "Hello, world!" << endl;
+        cout << "by " << author << endl;
+    }
+
+    int main() {
+        hello_world();
+    }
+
+Declaration and Definition separated:
+
+    void hello_world(string author = "anonymous");
+
+    int main() {
+        hello_world();
+    }
+
+    void hello_world(string author) {
+        cout << "Hello, world!" << endl;
+        cout << "by " << author << endl;
+    }
+
+Note the order of the functions. In the first example, both the declaration and definition are together and the function is called in a different function after the definition. In the second example, the declaration is before the function call, while the definition is somewhere else. As long as the declaration comes before the function is called and there is a definition somewhere, the program will compile correctly. This method is more often used in conjunction with `header files` and `libraries` such as `iostream` (discussed later).
+
+There are some variations to the separate declaration. In the example, a default argument was specified. Notice that the definition of the function then doesn't specify the default value. When not using default values, the use of variable names in the declaration are optional:
+
+    void hello_world(string); // variable names are optional
+
+    int main() {
+        hello_world("anonymous");
+    }
+
+    void hello_world(string author) {
+        cout << "Hello, world!" << endl;
+        cout << "by " << author << endl;
+    }
+
+## #funflow Program Flow
+
+Function calls alter execution flow by executing blocks of code defined by functions. Because these blocks of code are referenced by function names, they can be executed multiple times from multiple locations. This is most clearly shown by `tracing` the execution of a program by following the function calls. Let's being with the basic `main` program:
+
+    int main() {
+        // main body
+    }
+
+`main` is always the first function called when an executable program is run.
+
+    .gv
+    [] [y] enter
+    [] [g] "main()"
+    [] [y] exit
+
+    enter -> "main()"
+    "main()" -> exit
+
+This is the basic flow of a program. On the start, the program enters the main function, executes the body (not shown because there are no function calls), and returns.
+
+Now consider a single function call to `max()` in the body of `main`:
+
+    int max(int a, int b) {
+        if(a > b)
+            return a;
+        return b;
+    }
+
+    int main() {
+        int a = max(1, 2);
+    }
+
+This looks like:
+
+    .gv
+    [] [y] enter
+    [] [g] "main()"
+    [] [g] "max(1, 2)"
+    [] [y] exit
+
+    enter -> "main()"
+    "main()" -> "max(1, 2)"
+    "max(1, 2)" -> "main()"
+    "main()" -> exit
+
+    .eq "main()" "max(1, 2)"
+
+Another way to show this is:
+
+    main()
+        max(1, 2)
+
+Both of these show that within the `main()` function call, another function `max(1,2)` was called, which returned back to the `main()` function upon completion before exiting. The second way is a visualisation of the `call stack`, the series of function calls made by the program.
+
+Now, let's call it multiple times:
+
+    int max(int a, int b) {
+        if(a > b)
+            return a;
+        return b;
+    }
+
+    int main() {
+        int a = max(1, 2);
+        a = max(a, 3);
+        a = max(a, 4);
+    }
+
+Graphical flow:
+
+    .gv
+    [] [y] enter
+    [] [g] "main()"
+    [] [g] "max(1, 2)"
+    [] [g] "max(2, 3)"
+    [] [g] "max(3, 4)"
+    [] [y] exit
+
+    .he enter -> "main()"
+    "main()" .. "max(1, 2)"
+    "max(1, 2)" .. "main()"
+    "main()" .. "max(2, 3)"
+    "max(2, 3)" .. "main()"
+    "main()" .. "max(3, 4)"
+    "max(3, 4)" .. "main()"
+    .he "main()" .. exit
+
+    .ie "max(1, 2)" .. "max(2, 3)"
+    .ie "max(2, 3)" .. "max(3, 4)"
+    .ie "max(3, 4)" .. exit
+
+    .eq "enter" "max(1, 2)"
+    .eq "main()" "max(2, 3)"
+
+Call stack:
+
+    main()
+        max(1, 2)
+        max(2, 3)
+        max(3, 4)
+
+(from here on, we will rely on the call stack visualization)
+
+Functions can be called inside functions. (main() already does that)
+
+    void innerFunction() {
+        // body
+    }
+
+    void outerFunction() {
+        // body
+        innerFunction();
+    }
+
+    int main() {
+        outerFunction();
+        innerFunction();
+    }
+
+Call stack:
+
+    main()
+        outerFunction()
+            innerFunction()
+        innerFunction()
+
+### #recur Recursion
+
+`recursion` is a programming technique involving repeated calls of a function. In particular, a `recursive function` is a function that calls itself in some way in order to accumulate and combine the results. Let's take the classic Fibonacci sequence. The sequence is:
+
+    1 1 2 3 5 8 13 21 34 55 ...
+
+The basic algorithm is: begin with 1 and 1, then each subsequence number is the sum of the previous two numbers. The problem then is to calculate the number at any given position. If you translate that into pseudocode:
+
+    if position <= 2
+        number at that position is 1
+    otherwise,
+        sum the previous 2 numbers
+
+If we have a function named `fib` that takes in a single position parameter:
+
+    int fib(int position);
+
+then the psuedocode would look like:
+
+    if position <= 2
+        number at position is 1
+    otherwise
+        number at position is fib(position - 1) + fib(position - 2)
+
+Now, notice that what this block of code calculates the number that appears at the given position and that it requires the function `fib` that calculates the number at the given position. This is a recursive definition! It requires itself! Thus:
+
+    int fib(int position) {
+        if(position <= 2) {
+            return 1;
+        } else {
+            return fib(position - 1) + fib(position - 2);
+        }
+    }
+
+That is the complete recursive Fibonacci function.
+
+Now, here is an example call stack traces.
+
+`fib(5)`
+
+    fib(5)
+     |  fib(4)
+     |   |  fib(3)
+     |   |   |  fib(2)
+     |   |   -  fib(1)
+     |   -  fib(2)
+     |  fib(3)
+     |   |  fib(2)
+     -   -  fib(1)
+
+Notice how each call to `fib` results in 2 more calls to `fib` and that there are sometimes multiple calls to `fib` with the same parameters. You can eliminate the duplicate function calls with a technique called `memoization` which is not discussed here. The 2 calls are necessary in this algorithm. However, there is also another programming technique that looks very different, but can be used to achieve the same thing.
+
+### #iter Iteration
+
+`iteration` is a programming technique involving repeated calls of a function. In particular, an `iterative function` is a function that calls itself in order to refine the current state of the function in an iterative improvement. This is more clearly shown by example.
+
+This is the iterative version of `fib`:
+
+    int fib(int position, int current = 1, int previous = 0) {
+        if( position == 1 ) {
+            return current;
+        } else {
+            return fib(position -1, current + previous, current);
+        }
+    }
+
+This may not be as intuitive as the recursive version, but this computes the same results and is actually better in terms of function calls:
+
+`fib(5)`
+
+    fib(5)
+    |   fib(4, 1, 1)
+    |   |   fib(3, 2, 1)
+    |   |   |   fib(2, 3, 2)
+    -   -   -   -   fib(1, 5, 3)
+
+Notice how the second parameter `a` moves along the Fibonacci sequence as it iteratively gets closer to the actual solution. Also, notice how the call stack looks very different from the recursive version. While the recursive version requires 2 calls to itself and post-computation (adding the results), the iterative version computers the sequence along the way and returns the final answer with the last function call.
