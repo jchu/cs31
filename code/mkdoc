@@ -62,7 +62,7 @@ sub main {
         my $mkt = `cat $mkd`;
         $mkt =~ s/^(#+) #(\S+) /$1 <a name="$2"><\/a> /mg;
         $mkt =~ s/^\[\[TOC\]\]/$ct{$b}/mg;
-        open($fh, "|-", "$MKD | $GV $IMGDIR | $PP >> $b.html")
+        open($fh, "|-", "$MKD | $GV $IMGDIR $b | $PP >> $b.html")
           and print $fh $mkt, "\n\n", $mf
           and close $fh;
 
