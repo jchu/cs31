@@ -1,0 +1,250 @@
+# Sample Programs
+
+## Array Sorting
+
+### Insertion Sort
+
+Showcases array manipulation
+
+    /************************************************
+     *
+     * Insertion Sort Example
+     *
+     * Sort a user defined array of size ARRAY_SIZE
+     * using insertion sort algorithm
+     *
+     ************************************************/
+    #include <iostream>
+    using namespace std;
+    
+    const int ARRAY_SIZE = 10;
+
+    void sort(int[], int);
+    void move_over(int[], int, int);
+    void display(int[], int);
+    
+    int main() {
+        cout << "Enter " << ARRAY_SIZE << " unsorted numbers "
+             << "(each followed by newline):" << endl;
+    
+        int numbers[ARRAY_SIZE];
+        for(int i = 0; i < ARRAY_SIZE; i++ ) {
+            cout << "> ";
+            cin >> numbers[i];
+        }
+    
+        // reprint array for user
+        display(numbers, ARRAY_SIZE)
+    
+        sort(numbers, ARRAY_SIZE);
+
+        // display results
+        display(numbers, ARRAY_SIZE)
+    }
+
+    /**
+     * Print out array
+     *
+     * \param array Array to print
+     */
+    void display(int array[], int size) {
+        for(int i = 0; i < size; i++ ) {
+            cout << display[i] << " ";
+        }
+        cout << endl;
+    }
+    
+    /**
+     * Sort array using insertion sort algorithm
+     *
+     * \param array Array to sort
+     * \param size  Size of array
+     */
+    void sort(int array[], int size) {
+        for(int i = 1; i < size; i++) {
+            // invariant: everything to the left of i is sorted
+            for(int j = 0; j < i; j++ ) {
+                if( array[i] < array[j] ) {
+                    int temp = array[i];
+                    move_over(array, j, i);
+                    array[j] = temp;
+                }
+            }
+        }
+    }
+    
+    /**
+     * Moves all elements to the right once
+     *
+     * \param array Array to modify
+     * \param start Leftmost index to move
+     * \param last  Rightmost index to move
+     *              Must be < size - 1 of array
+     */
+    void move_over(int array[], int start, int last) {
+        for(int i = last; i >= start; i--) {
+            array[i] = array[i-1];
+        }
+    }
+
+## Black Jack
+
+The game of Black Jack involves:
+
+1. Making a random deck of cards
+2. Dealing cards
+3. User decision or AI
+4. Enforcing Rules
+
+### Creating the deck
+
+Showcases functions, array manipulation, number representation.
+
+    /************************************************
+     *
+     * Shuffle Decks
+     *
+     * Sample program that creates and shuffles decks
+     *
+     * Cards are representd by a single integer. The
+     * last digit represents the suit, while the
+     * preceding digits represent the rank.
+     *
+     * The deck is shuffled with a simpel random swap.
+     *
+     ***********************************************/
+    
+    #include <iostream>
+    #include <cstdlib>
+    #include <ctime>
+    using namespace std;
+    
+    
+    void shuffle_deck(int deck[], int size);
+    void swap_cards(int deck[], int a, int b);
+    void make_ordered_deck(int deck[]);
+    void print_deck(int deck[]);
+    void print_card(int card);
+    
+    const int DECK_SIZE = 52;
+    int deck[DECK_SIZE];
+    
+    int main() {
+        srand(time(0));
+    
+
+        // For demo purposes, create and shuffle 5 decks
+        for(int i = 0; i < 5; i++) {
+            cout << "Round " << i << endl;
+            make_ordered_deck(deck);
+    
+            cout << endl << "Before: ";
+            print_deck(deck);
+            shuffle_deck(deck, DECK_SIZE);
+            cout << endl  << "After: ";
+            print_deck(deck);
+            cout << endl << endl;
+        }
+    }
+    
+    
+    
+    /** 
+     * Shuffle deck
+     *
+     * \param deck  Deck to shuffle
+     * \param size  size of deck left to shuffle
+     */
+    void shuffle_deck(int deck[], int size) {
+        if( size == 0 )
+            return;
+        int i = rand() % size;
+        swap_cards(deck, i, size-1);
+        shuffle_deck(deck, size-1);
+    }
+    
+    /**
+     * Swap any pair of cards in the deck
+     *
+     * \param deck  Deck of cards
+     * \param a     A card
+     * \param b     Another card
+     */
+    void swap_cards(int deck[], int a, int b) {
+        if( a != b ) {
+            deck[a] ^= deck[b];
+            deck[b] ^= deck[a];
+            deck[a] ^= deck[b];
+        }
+    }
+    
+    /**
+     * Initialize a completely ordered deck
+     *
+     * \param deck  Deck to initalize
+     */
+    void make_ordered_deck(int deck[]) {
+        for(int i = 0; i < DECK_SIZE; i++) {
+            // last digit represents suit
+            // other digits represent rank
+            deck[i] = (((i % 13)+1) * 10) + i / 13;
+        }
+    }
+    
+    /**
+     * Print out cards in the deck
+     *
+     * \param deck  Deck to print
+     */
+    void print_deck(int deck[]) {
+        for(int i = 0; i < DECK_SIZE; i++ ) {
+            if(i % 13 == 0)
+                cout << endl;
+            print_card(deck[i]);
+            cout << "\t";
+        }
+    }
+    
+    /**
+     * Print out a card
+     *
+     * \param card  Card
+     */
+    void print_card(int card) {
+        int rank = card / 10;
+        int suit = card % 10;
+    
+        switch(rank) {
+            case 1:
+                cout << "A";
+                break;
+            case 11:
+                cout << "J";
+                break;
+            case 12:
+                cout << "Q";
+                break;
+            case 13:
+                cout << "K";
+                break;
+            default:
+                cout << rank;
+                break;
+        };
+    
+        switch(suit) {
+            case 0:
+                cout << "H";
+                break;
+            case 1:
+                cout << "S";
+                break;
+            case 2:
+                cout << "D";
+                break;
+            case 3:
+                cout << "C";
+                break;
+        };
+    
+    }
