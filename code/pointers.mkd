@@ -1,0 +1,127 @@
+# Pointers
+
+## Arrays
+
+Before we discuss pointers, let's explore a more basic datatype: arrays. Arrays are a list of data of a single datatype:
+
+    data_type variable_name[size of array]
+
+Arrays can hold any single datatype from integers to strings and more arrays.
+
+    string names[10]; // can hold 10 strings
+    bool bdays[365]; // can hold 365 booleans
+    double price[20]; // can hold 20 doubles
+
+Like variables, when an array is declared, it sets aside the requires space for the data in memory. This is done at compile time. Thus, arrays must have a constant defined size. The consequence is that arrays cannot be defined with a variable size.
+
+    int a = 10;
+    int fruits[a]; // invalid declaration
+
+However, arrays can be defined with `const int`:
+
+    const int NUM_DAYS_IN_WEEK = 7;
+    string days[NUM_DAYS_IN_WEEK];
+
+### Initialization
+
+Arrays have a special syntax for initilization called `initialization lists`. Arrays can be initialized to a default value, partial list, or a full list of values. An `initialization list` looks like:
+
+    { 1, 2, 3, 4 }
+    { "Sunday", "Monday", "Tuesday" }
+
+Arrays can be simultaneously declared and initialized at the same time. However, initialization of an entire array can only be done during declaration. Array assignment (as opposed to an array element assignment) is not valid.
+
+    string days[7] = { "Sunday",
+                       "Monday",
+                       "Tuesday",
+                       "Wednesday",
+                       "Thursday",
+                       "Friday",
+                       "Saturday" }; // initialize all 7 days of the week
+    bool bdays[365] = { false }; // initialize all 365 bools to false
+    int nums[10] = { 1, 2, 3, 4 }; // set first 4 numbers and initialize rest to 0
+    string seasons[] = { "Fall", "Winter", "Spring", "Summer" };
+        // declare and initialize a 4 element string array
+
+If the size of the array is explicit, all elements can be initialized by either only setting the first element (all have same value), explicitly setting some elements (rest are defaulted to the type default), or explictely settings all elements. If the size of the array is omitted, the size of the initialization list is the size of the array.
+
+char arrays can be set with strings:
+
+    char message[100] = "This is a message"; // rest of array is initialized to 0
+    char hello[] = "Hello"; // 5 character array
+
+### Usage
+
+Array elements are accessed by the `index` starting from 0. Unlike initialization, access can be done using expressions.
+
+    int a[5];
+    for(int i = 0; i < 5; i++) {
+        a[i] = i+1;
+        cout << a[i] << endl;
+    }
+
+outputs:
+
+    1
+    2
+    3
+    4
+    5
+
+The behaviour is unpredictable for uninitialized elements and indices beyond the bounds of the array. Important: ensure an element is initialized or assigned before it is accessed; ensure the index never goes out of bounds. Compilers may or may not catch these errors because they are perfectly valid statements.
+
+
+### Multidimensions
+
+Arrays can go beyond a single dimension, simply be specifying the size of those dimensions.
+
+    int square[4][4]; // 4 x 4 array
+    int cube[3][3][4]; // 3 x 3 x 4 array
+
+And they can be initialized like normal arrays:
+
+    int square[4][4] = {0}; // all elements are 0
+    int month[12][1] = {
+        { 31 },
+        { 28 },
+        { 31 },
+        { 30 },
+        { 31 },
+        { 30 },
+        { 31 },
+        { 31 },
+        { 30 },
+        { 31 },
+        { 30 },
+        { 31 }
+        }; // each first dimension has an array as a value
+
+### Function Parameters
+
+Arrays are different from regular variables when passed as arguments to functions. They can only be used in `pass-by-reference`. There is no way to automatically pass an entire array copy to a function. One way around this is to manually copy the array to a new array variable and pass that new array as a function argument. 
+
+Furthermore, there is no way to automatically determine the size of an array as a paremeter. The size must be another argument to the function. There is a caveat for multidimensional arrays. While the first dimension's size cannot be predetermined, all the other dimensions must be specified.
+
+single dimensional array: 
+
+    void initialize_array(int[], int);
+
+    void initialize_array(int array[], int size) {
+        for(int i = 0; i < size; i++) {
+            array[i] = 0;
+        }
+    }
+
+multi-dimensional array:
+
+    void initialize_array(int[][100], int);
+
+    void initialize_array(int array[][100], int size) {
+        for(int row = 0; row < size; row++) {
+            for(int col = 0; col < size; col++) {
+                array[row][col] = 0;
+            }
+        }
+    }
+
+Note: Arrays can only be returned as their actual manifestation as pointers (discussed later).
