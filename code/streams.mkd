@@ -1,0 +1,164 @@
+# Streams
+
+[[TOC]]
+
+Streams are objects that represent continuous data sources and data sinks. The most basic stream is a file stream. A file stream represents the flow of data into and out of a file pipe. In \*nix systems, everything can be represented as a file. So in essence, everything can be represented as a file stream as well.
+
+Streams are often used as data storage and as vehicles to convey data from one program to another.
+
+## I/O Streams
+
+I/O means input and output. I/O streams give programs the ability to take in input from outside the program and output data outside of the program. These concepts are termed as `read` and `write`.
+
+The `iostream` library provides access to the console stream via `std::cin` and `std::cout`. These streams are manipulation via the `extraction operator` `>>` and the `insertion operator` `<<`. The `extractor operator` extracts data from the stream and places it in variable specified after the operator. Depending on the type of variable, the operator reads exactly that many bytes from the stream (e.g. if a `char` is specified, only 1 byte is read from the stream). Similarity, the `insertion operator` takes the value of the data specified on the right and appends the value to the stream (e.g. if a string is specified, it appends the string to the stream). In the case of the console, the stream is the console. `read` for the console means reading keyboard input while `write` means printing characters to the console screen.
+
+### #ops Common Operations
+
+There are only a couple operations needed to use I/O streams.
+
+1. `open`:
+When using a stream, it must be connected to the actual stream. `cin` and `cout` are automatically connected to the appropriate console streams. File streams must be connected to an actual file on the system.
+There are multiple methods to open a stream that influence the behaviour of other options. For example, by default, when a file stream is opened for writing, it is truncated. In order to append to the file, the append option must be specified.
+
+2. `close`:
+When programs are done reading/writing to a stream, the stream must be closed. Failure to close the stream, either by design or by abnormal program termination will result in leftover "open" streams. If these streams are tied to resources such as a normal file, other programs may have issues using the files.
+
+3. read:
+Input streams must be able to be read from.
+
+4. write:
+Output streams must be able to be written to.
+
+There are some additional help functions to help get the status of streams.
+
+* `fail`:
+`fail` returns a `bool` that indicates whether a stream is successfully opened. `fail` should be checked immediately after a stream is opened.
+
+* `eof`:
+`eof` returns a `bool`. An `EOF` is a special symbol that indicates the `end-of-file`. This is only valid for input streams as an indication that there is no more data left in the stream to read. Any subsums read operations will result in the `eof` function to return `true`. This function is commonly used in a loop to determine if there is any more data left in the stream to read.
+
+
+## #fstream File Streams
+
+Files are the most common form of I/O next to consoles and GUIs. File streams are made available via the `fstream` library via `std::ifstream` for input file stream and `std::ofstream` for output file stream.
+
+    #include <fstream>
+    using namespace std;
+
+    ifstream iStream;
+    ofstream oStream;
+
+### Open
+
+File streams must be connected to a file from the filesystem.
+
+    iStream.open(filename);
+    oStream.open(filename);
+    iStream.open(filename, mode);
+    oStream.open(filename, mode);
+
+`filename` is a string representing the path to the file. This path can be relative to the current location or an absolute path. The format of the path is operating system dependent ( `/path/to/file` or `path/to/file` for \*nix or 'DRIVE:/path/to/file` or `path/to/file` for Windows).
+
+`mode` is a combination of mode flags defined in the libraries. The most important mode is `ios::app` which stands for append. With this mode, when a file is written to, the data is appended to the end ("added" in laymans terms) without overwriting existing data. If no mode is specified, the mode defaults to `ios::in` which allows for input operations which will effectively overwrite any existing data in the file.
+
+Alernatively, the stream can be opened upon declaration with the same parameters:
+
+    ifstream iStream(filename);
+    ofstream oStream(filename);
+    ifstream iStream(filename, mode);
+    ofstream oStream(filename, mode);
+
+### Close
+
+File streams should be closed when they are no longer needed.
+
+    iStream.close();
+    oStream.close();
+
+If multiple streams are sequentially connected to the same file (e.g. Write to a file using `ofstream` and subsequently reading the file using `ifstream`), the `oftream` should close before the `ifstream` opens the file. Also, it is recommended not to open multiple streams for the same file unless it is intentional.
+
+### Read
+
+Read operations can only be performed on `ifstream`.
+
+Formatted read operations are done using the `extraction operator >>` (just like with `cin`).
+
+### Write
+
+Write operations can only be performed on `ofstream`.
+
+Formatted write operations are done using the `insertion operator <<` (just like with `cout`).
+
+Write operations are buffered by the operating system. This allows the operating system to "cache" or accumulate writes to the stream and then do the actual write operations at all once. To force the operating system to write to the stream immediately, the `flush` function is called:
+
+    oStream.flush();
+
+### Example
+
+Consider a file named `sequence` that contains the following content:
+
+    1
+    1
+    2
+    3
+    5
+    8
+    13
+    21
+    34
+    55
+
+This `sequence` file contains the Fibonacci sequence. The running total will be printed out into another file calls `sums` which will look like this:
+
+    1
+    2
+    4
+    7
+    12
+    20
+    33
+    54
+    88
+    143
+    198
+
+So the program will read the `sequence` file, keep track of the running total, and write that total to the `sums` file.
+
+    #include <fstream>
+    #include <iostream>
+    #include <cstdlib>
+    using namespace std;
+    
+    int main() {
+        // Declare streams
+        ifstream iStream;
+        ofstream oStream;
+
+        // Open streams
+        iStream.open("sequence");
+        oStream.open("sums");
+
+        // Check for failures
+        if(iStream.fail()) {
+            cout << "Failed to open: sequence" << endl;
+        }
+        if(oStream.fail()) {
+            cout << "Failed to open: sums" << endl;
+        }
+
+
+        // Read, calculate, write
+        int runningTotal = 0;
+        int num;
+        while(!iStream.eof()) {
+            iStream >> num;
+            runningTotal += num;
+            oStream << runningTotal << endl;
+        }
+
+        // Close streams
+        iStream.close();
+        oStream.close();
+
+        return 0;
+    }
