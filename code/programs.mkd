@@ -1,5 +1,7 @@
 # Sample Programs
 
+[[TOC]]
+
 ## Array Sorting
 
 ### Insertion Sort

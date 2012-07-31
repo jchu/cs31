@@ -1,6 +1,8 @@
 # Pointers
 
-## Arrays
+[[TOC]]
+
+## #arr Arrays
 
 Before we discuss pointers, let's explore a more basic datatype: arrays. Arrays are a list of data of a single datatype:
 
@@ -22,7 +24,7 @@ However, arrays can be defined with `const int`:
     const int NUM_DAYS_IN_WEEK = 7;
     string days[NUM_DAYS_IN_WEEK];
 
-### Initialization
+### #initlist Initialization
 
 Arrays have a special syntax for initilization called `initialization lists`. Arrays can be initialized to a default value, partial list, or a full list of values. An `initialization list` looks like:
 
@@ -71,7 +73,7 @@ outputs:
 The behaviour is unpredictable for uninitialized elements and indices beyond the bounds of the array. Important: ensure an element is initialized or assigned before it is accessed; ensure the index never goes out of bounds. Compilers may or may not catch these errors because they are perfectly valid statements.
 
 
-### Multidimensions
+### #dim Multidimensions
 
 Arrays can go beyond a single dimension, simply be specifying the size of those dimensions.
 
@@ -96,7 +98,7 @@ And they can be initialized like normal arrays:
         { 31 }
         }; // each first dimension has an array as a value
 
-### Function Parameters
+### #arrparam Function Parameters
 
 Arrays are different from regular variables when passed as arguments to functions. They can only be used in `pass-by-reference`. There is no way to automatically pass an entire array copy to a function. One way around this is to manually copy the array to a new array variable and pass that new array as a function argument. 
 

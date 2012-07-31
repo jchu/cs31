@@ -1,10 +1,10 @@
 # Streams
 
-[[TOC]]
-
 Streams are objects that represent continuous data sources and data sinks. The most basic stream is a file stream. A file stream represents the flow of data into and out of a file pipe. In \*nix systems, everything can be represented as a file. So in essence, everything can be represented as a file stream as well.
 
 Streams are often used as data storage and as vehicles to convey data from one program to another.
+
+[[TOC]]
 
 ## I/O Streams
 

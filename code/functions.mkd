@@ -1,8 +1,8 @@
 # Functions
 
-[[TOC]]
-
 Functions encompass a block of code under a name. A function declaration describes what that block of code (by name) and how to interact with it.
+
+[[TOC]]
 
 ## #syntax Basic Syntax
 

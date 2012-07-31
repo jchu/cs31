@@ -1,8 +1,8 @@
 # Variable Scopes
 
-[[TOC]]
-
 Scopes define where variables are defined and accessible at any point in a program. When a variable is declared, it creates a space in memory that is reserved for the value of that variable. This space is then referenced by the variable name.
+
+[[TOC]]
 
 ## Scopes
 
