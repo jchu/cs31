@@ -1,0 +1,104 @@
+# Strings
+
+Strings are a sequence of characters and a character is represented as a number. There are two types of "strings" available in C++: the C-string which is an array of characters provided by the `cstring` library and the `string` datatype which is provided by the `string` library. `string` is a class that is implemented behind the scenes as a C-string. However, `string` provides more intuitive string manipulation functions. For the purposes of this class, `string` should be used.
+
+[[TOC]]
+
+## `string`
+
+The `string` class defines a `string` as a basic datatype. It is provided by the `string` library and provides several convenient intuitive operator definitions.
+
+    // Declaration
+    string newString;               // A declared string is initialized to the empty string
+    string aString("a string");     // A string can be declared and initialized  simultaneously
+    string bString(aString);        // A string can be initialized by copying another string
+
+    // Assignment and Concatenation
+    string city = "Los Angeles";    // strings can be initialized using ""
+    string state = "California";
+    string school = "University of " + state + ", " + city;
+        // strings can be concatenated with the + operator
+
+`string` variables can be compared lexicographically (ASCII code ordering: punctuation < numbers < other punctuation < capital letters < lowercase letters). Note: Unless `string` variables are used in comparison, the comparisons would be done as C-strings which do not compare lexicographically. 
+
+    // String comparisons
+    if(aString == bString) {
+        cout << aString << " and " << bString << " are the same!" << endl;
+    }
+    if(state < city) {
+        cout << state << " comes before " << city << " lexicographically." << endl;
+    }
+
+### #op Common Operations
+
+Get length of string: `str.length()`
+
+    string emptyString = "";
+    emptyString.length();   // returns 0
+
+    string posString = "0123456789";
+    posString.length();     // returns 10
+
+Extract a single character from a string: `str.at(i)`:
+
+    string posString = "123456789";
+    posStringat(0);       // extracts "1"
+
+Extract a substring from a string: `str.substr(position, length)`
+
+    string longString = "I am a string";
+    string shortString = longString.substr(7, 6); // extracts "strings"
+
+Check if a string is an empty string: `str.empty()`
+
+    string emptyString = "";
+    if(emptyString.empty())
+        cout << "emptyString is empty" << endl;
+
+Search for the first occurrence of a substr: `str.find(str1)`
+
+    string sentence = "I am a sentence.";
+    sentence.find("sent"); // returns 7, starting position of substring
+
+Many other functions can be found in the C++ Reference.
+
+### #input String as Input
+
+The `extraction operator >>` takes in user input up to any whitespace. If used in conjunction with `string` variables, this would mean only an individual word is assigned to the variable.
+
+    string word;
+    while(true) {
+        cin >> word;
+        cout << word << endl;
+    }
+
+If the user types in:
+
+    To be or not to be
+
+The program would output:
+
+    To
+    be
+    or
+    not
+    to
+    be
+
+In order to capture an entire line of user input up when the user inputs a newline (presses enter), the `getline` function is used.
+
+    string sentence;
+    getline(cin, sentence);
+    cout << sentence << endl;
+
+Now the program would output:
+
+    To be or not to be
+
+### #array Strings like an Array
+
+The `string` class provides array-like accessors to access individual characters in a string using array indexing.
+
+    string posString = "123456789";
+    posString[0];       // is 1
+    posString[8];       // 9
