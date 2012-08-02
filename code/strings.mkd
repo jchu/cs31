@@ -13,6 +13,8 @@ The `string` class defines a `string` as a basic datatype. It is provided by the
     string aString("a string");     // A string can be declared and initialized  simultaneously
     string bString(aString);        // A string can be initialized by copying another string
 
+`string` makes assignment and manipulation easy:
+
     // Assignment and Concatenation
     string city = "Los Angeles";    // strings can be initialized using ""
     string state = "California";
@@ -60,6 +62,11 @@ Search for the first occurrence of a substr: `str.find(str1)`
     string sentence = "I am a sentence.";
     sentence.find("sent"); // returns 7, starting position of substring
 
+Some functions may ask for a `const char *` instead of a `string`. A `const char *` can be retrieved using `str.c_str()`
+
+    string str = "I am a string";
+    const char * = str.c_str();
+
 Many other functions can be found in the C++ Reference.
 
 ### #input String as Input
@@ -100,5 +107,13 @@ Now the program would output:
 The `string` class provides array-like accessors to access individual characters in a string using array indexing.
 
     string posString = "123456789";
-    posString[0];       // is 1
-    posString[8];       // 9
+    posString[0];       // is '1'
+    posString[8];       // '9'
+
+### Strings as Parameters
+
+`strings` as objects should be passed by reference when used as function parameters.
+
+    void printMessage(string& message) {
+        cout << message << endl;
+    }
