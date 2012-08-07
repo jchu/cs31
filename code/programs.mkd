@@ -250,3 +250,344 @@ Showcases functions, array manipulation, number representation.
         };
     
     }
+
+## Pong
+
+Really simple game of pong.
+
+Move the paddle left and right, making sure the ball never touched the ground.
+
+There are 3 objects - the playing board, the ball, and the paddle.
+
+Showcases classes and objects, multiple compilation, Makefile.
+
+[pong source tarball](pong.tar)
+
+### game.cpp
+
+A game consists of the infinite game loop until the game is over.
+
+    #include <iostream>
+    
+    #include "pong.h"
+    
+    using namespace std;
+    
+    int main() {
+        cout << "Pong" << endl;
+    
+        Pong game = Pong();
+    
+        while(true) {
+            // Run the game for one tick
+            if( !game.tick() )
+                break; // game is over when tick returns false
+        }
+    
+        cout << "Game Over!" << endl;
+    }
+
+### pong.h
+
+The `pong` class contains all the game elements - board, ball, and paddle. It also knows how to print the board and run one tick of the game.
+
+    #ifndef PONG_H
+    #define PONG_H
+    
+    #include "ball.h"
+    #include "paddle.h"
+    
+    // Game constants
+    const double GAME_WIDTH =       41;
+    const double GAME_HEIGHT =      40;
+    const double PADDLE_X =         6;
+    const double PADDLE_Y =         5;
+    const double PADDLE_WIDTH =     10;
+    const double BALL_INITX =       21;
+    const double BALL_INITY =       30;
+    const double BALL_INITXVEL =    -2;
+    const double BALL_INITYVEL =    -2;
+    
+    class Pong {
+    
+    public:
+        Pong() : gwidth(GAME_WIDTH), gheight(GAME_HEIGHT),
+            ball(BALL_INITX, BALL_INITY, BALL_INITXVEL, BALL_INITYVEL),
+            paddle(PADDLE_X, PADDLE_Y, PADDLE_WIDTH) {};
+    
+        // Accessors
+        double width() { return gwidth; }
+        double height() { return gheight; }
+    
+        /**
+         * Execute a single tick of the game
+         *
+         * Display board, ask for user input, and move paddle/board
+         *
+         * \return bool false on game over
+         */
+        bool tick();
+    
+        /**
+         * Display the board, ball, paddle
+         */
+        void display();
+    
+    private:
+        double gwidth, gheight;
+        Ball ball;
+        Paddle paddle;
+    };
+    
+    #endif
+
+### pong.cpp
+
+Implementation of the `pong` class methods.
+
+    #include <iostream>
+    
+    #include "ball.h"
+    #include "paddle.h"
+    #include "pong.h"
+    
+    using namespace std;
+    
+    /**
+     * Execute a single tick of the game
+     *
+     * Display board, ask for user input, and move paddle/board
+     *
+     * \return bool false on game over
+     */
+    bool Pong::tick() {
+        display();
+    
+        char dir;
+        cout << "Move paddle (l, r, n): ";
+        cin >> dir;
+    
+        paddle.move(dir, gwidth-1);
+        ball.move(gwidth-1, gheight-1, paddle.left(), paddle.right(), paddle.y());
+    
+        if( ball.ypos() < 0 )
+            return false;
+        return true;
+    }
+    
+    /**
+     * Display the board, ball, paddle
+     *
+     * Board runs from 0 to gwidth and 0 to gheight.
+     * (0,0) is bottem left corner
+     * Board has a 1 character border on the edges
+     */
+    void Pong::display() {
+        for( int y = gheight; y >= 0; y-- ) {
+            for( int x = 0; x <= gwidth; x++ ) {
+                if( y == gheight || y == 0 ) {
+                    if( x == 0 || x == gwidth )
+                        cout << '+'; // corners
+                    else
+                        cout << '-'; // top/bottom edges
+                } else if(x == 0 || x == gwidth) {
+                    cout << "|"; // side edges
+                } else if( ball.xpos() == x && ball.ypos() == y ) {
+                    cout << 'o'; // ball position
+                } else if( paddle.y() == y
+                        && (paddle.left() <= x && paddle.right() >= x)) {
+                    cout << '_'; // paddle
+                } else {
+                    cout << ' '; // empty space
+                }
+    
+                if( x == gwidth ) {
+                    cout << endl; // newline for next row
+                }
+            }
+        }
+    }
+
+### ball.h
+
+A `ball` knows where it is, how fast its going, and how to move.
+
+    #ifndef BALL_H
+    #define BALL_H
+    
+    class Ball {
+    
+    public:
+    
+        Ball(double initx, double inity, double initxvel, double inityvel)
+            : x(initx), y(inity), bxvel(initxvel), byvel(inityvel) {}
+    
+        // Accessors
+        double xpos() const { return x; }
+        double ypos() const { return y; }
+        double xvel() const { return bxvel; }
+        double yvel() const { return byvel; }
+    
+        /**
+         * Move the ball and consider bounces and endgame
+         *
+         * \param xmax          max x position for ball
+         * \param ymax          max y position for ball
+         * \param paddleleft    left x position of paddle
+         * \param paddleright   right x position of paddle
+         * \param paddley       y position of paddle
+         */
+        void move(double xmax, double ymax, double paddleleft, double paddleright, double paddley);
+    
+    private:
+        double x, y;
+        double bxvel, byvel;
+    };
+    
+    #endif
+
+### ball.cpp
+
+Implementation of the `ball` class methods.
+
+    #include "ball.h"
+    
+    /**
+     * Move the ball and consider bounces and endgame
+     *
+     * Ball normally moves bxvel, byvel in one tick.
+     * May hit walls or paddle and reverse direction.
+     * Stops moving once it hits the floor.
+     *
+     * \param xmax          max x position for ball
+     * \param ymax          max y position for ball
+     * \param paddleleft    left x position of paddle
+     * \param paddleright   right x position of paddle
+     * \param paddley       y position of paddle
+     */
+    void Ball::move(double xmax, double ymax, double paddleleft, double paddleright, double paddley) {
+        if( x + bxvel < 0 ) {   // hit left wall
+            x = -(x + bxvel);
+            bxvel = -bxvel;
+        } else if( x + bxvel >= xmax ) { // hit right wall
+            x = (2 * xmax) - (x + bxvel);
+            bxvel = -bxvel;
+        } else { // normal
+            x += bxvel;
+        }
+    
+        if( y + byvel > ymax ) { // hit ceiling
+            y = (2 * ymax) - (y + byvel);
+            byvel = -byvel;
+        } else if( y + byvel < paddley
+            && (x > paddleleft && x < paddleright)) { // hit paddle
+            y = (2 * paddley) - (y + byvel);
+            byvel = -byvel;
+        } else if( y + byvel < 0 ) { // hit floor, ENDGAME
+            bxvel = 0;
+            byvel = 0;
+            x = -1;
+            y = -1;
+        } else { // normal
+            y += byvel;
+        }
+    }
+
+### paddle.h
+
+A `paddle` knows where it is and how to move.
+
+    #ifndef PADDLE_H
+    #define PADDLE_H
+    
+    class Paddle {
+    
+    public:
+        Paddle(double initx, double inity, double initwidth)
+            : px(initx), py(inity), pwidth(initwidth) {}
+    
+        // Accessors
+        double left() const { return px; }
+        double right() const { return px+pwidth; }
+        double width() const { return pwidth; }
+        double y() const { return py; }
+    
+        /**
+         * Move the paddle in a direction
+         *
+         * \param char dir      character representing direction
+         * \param double xmax   max x position for paddle
+         */
+        void move(char dir, double xmax);
+    
+    private:
+        double px, py;
+        double pwidth;
+    };
+    
+    #endif
+
+### paddle.cpp
+
+Implementation of the `paddle` class methods.
+
+    #include "paddle.h"
+    
+    /**
+     * Move the paddle in a direction
+     *
+     * \param char dir      character representing direction
+     * \param double xmax   max x position for paddle
+     */
+    void Paddle::move(char dir, double xmax) {
+        switch(dir) {
+            case 'l': // move left
+                px -= 1;
+                break;
+            case 'r': // move right
+                px += 1;
+                break;
+        };
+    
+        if( px < 1 ) // stop if hit left wall
+            px = 1;
+        else if( px + pwidth >= xmax ) // stop if hit right wall
+            px = xmax - pwidth;
+    }
+
+### Makefile
+
+Makefile to compile the program using GNU Make.
+
+    CC=g++
+    CFLAGS=-g -Wall
+    COMPILE=$(CC) $(CFLAGS)
+    
+    OBJECTS=pong.o paddle.o ball.o
+    
+    all: game
+    
+    ball.o: ball.h ball.cpp
+    	$(COMPILE) -c ball.cpp
+    
+    paddle.o: paddle.h paddle.cpp
+    	$(COMPILE) -c paddle.cpp
+    
+    pong.o: pong.h pong.cpp
+    	$(COMPILE) -c pong.cpp
+    
+    game: ball.o paddle.o pong.o game.cpp
+    	$(COMPILE) $(OBJECTS) -o game game.cpp
+    
+    clean:
+    	rm -f $(OBJECTS) game
+
+With this Makefile, just run `make && ./game`.
+
+Explicit commands using `g++`:
+
+    g++ -c ball.cpp
+    g++ -c paddle.cpp
+    g++ -c pong.cpp
+    g++ ball.o paddle.o pong.o -o game game.cpp
+    ./game
