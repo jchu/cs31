@@ -4,7 +4,7 @@
 
 ## Array Sorting
 
-### Insertion Sort
+### #insertsort Insertion Sort
 
 Showcases array manipulation
 
@@ -89,7 +89,7 @@ Showcases array manipulation
         }
     }
 
-## Black Jack
+## #21 Black Jack
 
 The game of Black Jack involves:
 
@@ -251,7 +251,7 @@ Showcases functions, array manipulation, number representation.
     
     }
 
-## Pong
+## #pong Pong
 
 Really simple game of pong.
 
