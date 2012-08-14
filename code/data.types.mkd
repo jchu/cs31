@@ -1,0 +1,199 @@
+# Data Types
+
+All data in C++ is associated with a `data type`, keywords that describe what kind of data is being stored by the program in memory. `data types` have an associated memory size.
+
+C++ comes with a handful of standard data types. Using `structs` and `classes`, `abstract data types` can be defined, providing more powerful data constructs.
+
+[[TOC]]
+
+## #num Numbers
+
+Computers are limited to the type of numbers they can represent because they store numbers internally in binary format.
+
+Additionally, C++ only has either soft or hard data size requirements on some types which may be dependent on the computer architecture (32-bit or 64-bit processors). 
+
+### #binary Binary Representation
+
+A single `bit` can represent a 1 or a 0. Thus, it represent numbers between `0` and `2^1 - 1` which are the numbers `0, 1`.
+
+A `byte` is 4 bits. 4 bits represent the binary numbers between `0000` and `1111`. Going by only positive numbers, this would represent the numbers between `0` and `2^4 -1` which are the numbers between `0` and `16`. However, in order to represent negative numbers, one of the bits will be used to indicate a positive or negative number. Thus, a `byte` used to represent both positive and negative numbers would range from `-2^3 -1` and `2^3 -1` or `(-7,7)`.
+
+The common data increments are `1 byte`, `4 bytes (16 bits)`, `8 bytes (32 bits)`, and `16 bytes (64 bits)`.
+
+### #int Integers
+
+`int` is the basic integer type, whole numbers without fractions
+
+A regular `int` is guaranteed to be at least 16 bits long, but is commonly implemented as a 32 bit number (range is `-2^{31} - 1` to `2^{31} - 1`).
+
+There are additional quantifiers that change this range.
+
+* `long`- integers guaranteed to be at least 32 bits long (thus commonly `int` and `long` are the same size)
+* `long long` - integers guaranteed to be at least 64 bits long (range is `-2^{63} - 1`` to `2^{63} - 1`)
+* `short` - integers guaranteed to be at least 16 bits long (range is `-2^{15} - 1` to `2^{15} - 1`)
+
+Integer types are by defaulted `signed`, meaning they use 1 bit to designate whether the number is positive or negative. Each type can be prepended with `unsigned` (e.g. `unsigned int`, `unsigned long`) to shift the range to only positive numbers (effectively doubling the maximum number representable).
+
+By default, literal integers (not variables, e.g. `0, 1, 2`) are of type `int`.
+
+Because of the C++ standard size guarantees, it is better to use `short`, `long`, and `long long` when declaring integer types rather than the traditional `int`.
+
+### #float Floating Point Numbers
+
+Real numbers that contain fractional parts are called `floating point numbers`.  In computers, all real numbers cannot be represented accurately in a fixed amount of memory. Thus, number representation relies on precision. Precision affects where the fractional part is truncated (not rounded up or down).
+
+There are three types of floating point numbers:
+
+* `float` - single precision floating point (precise up to 7 digits with range of about (`-10^{38}, 10^{38}`)
+* `double` - double precision floating point (precise up to 15 digits with range of about (`-10^{308}, 10^{308}`)
+* `long double` - extended precision floating point (precise up to 19 digits with range of about (`-10^{4932}, 10^{4932}`)
+
+Care must be taken care of when using `floating point numbers` because the number represented by the computer may be truncated. Arithmetic operations with these numbers may lead to imprecise numbers. If accuracy is required, arithmetic libraries should be used instead.
+
+By default, literal floating point numbers (not variables, e.g. `0.1, 2.3`) are of type `double`.
+
+## #bool Booleans
+
+A `boolean` is a `true` or `false`. They are 1 byte long (technically they can be 1 bit long).
+
+## #chars Characters
+
+A `character` is a symbol that is represented by the ASCII code - numbers, letters, punctuation, whitespace, etc.
+
+### #char Character
+
+A single character has type `char`, a 1 byte data type.
+
+### #string Strings of Characters
+
+When multiple characters are put together, they are termed `strings`. C++ has two ways to represent `strings`.
+
+* `char*` - a pointer to an array of characters that are NULL terminated
+* `string` - a class from the `string` library
+
+In most cases, it is advisable to use the `string` class to represent `strings`.
+
+Single quotes (`''`) denote a literal `char`, while double quotes (`""`) denote a literal `const char*` (not a `string`).
+
+## #adt Abstract Data Types
+
+Programs can declare their own data types as collections of known data types and other related properties.
+
+### #struct Structures
+
+`structures` are a collection of data types treated as one. They are declared as:
+
+    struct StructName {
+        type var0;
+        type var1;
+        type var2;
+    };
+
+`StructName` then becomes a data type that can be used. Variables within the structure are accessed with the `dot operator .`.
+
+    StructName myStruct;
+    myStruct.var0 = VALUE;
+    myStruct.var1 = VALUE;
+
+### #obj Classes
+
+`classes` are a collection of data types (termed `member variables`) and functions (termed `member functions`). In addition, `classes` restrict access to the member variables and functions using the `public` and `private` keywords (a programming paradigm called `encapsulation`.
+
+    class ClassName {
+    public:
+        ClassName(); # constructor
+
+        return_type funct0();
+        return_type funct1();
+
+    private:
+        return_type funct2();
+
+        type var0;
+        type var1;
+    };
+
+`ClassName` then becomes a data type that can be used. Public member variables (typically there are none) and public member functions can be accessed using the `dot operator .`. Private member variables and private member functions can only accessed from within member functions.
+
+    ClassName myClass = ClassName();
+    ClassName.funct0();
+    ClassName.funct1();
+
+## #pointer References
+
+`references` are data that `refer` to other data. In C++, they are called `pointers` and is implemented by using memory addresses.
+
+A `pointer` is declared using `*`:
+
+    int *char;  # pointer to an integer
+    double *char; # pointer to a double
+
+A `pointer` can point either to an existing variable using the `reference operator `&` or dynamically allocated memory using the `new` operator:
+
+    int a;
+    int *b = &a; # b points to a
+
+    int *c = new int; # c points to a dynamically allocated integer
+
+In order to obtain the referenced data, the `dereference operator *` is used:
+
+    int a = 1;
+    int *b = &a;
+
+    *b += 1; # value of a is now 2
+
+When a `pointer` points to `structs` and `classes`, the `arrow operator ->` can be used to simultaneous dereference and access public variables and public functions.
+
+structs:
+
+    struct Point {
+        int x;
+        int y;
+    };
+
+    Point *p0 = new Point;
+    p0->x = 0;
+    p0->y = 0;
+
+classes:
+
+    class BankAccount {
+    public:
+        BankAccount(double initial);
+        void deposit(double amount);
+
+    private:
+        double balance;
+    };
+
+    BankAccount *myAccount = new BankAccount(initial);
+    myAccount->deposit(100.0);
+
+### #arrays Arrays
+
+Arrays are a contiguous list of a single data type. There are two types of arrays:
+
+* static array - Arrays of a fixed constant size
+* dynamic array - Arrays of size determined at runtime
+
+Static arrays are declared with a constant size (constant being known at compile time):
+
+    int list[10]; # array of 10 ints
+
+    const int ITEMS = 12;
+    double prices[ITEMS]; # array of ITEMS doubles
+
+Multi-dimensional static arrays have another pair of `[]` to denote the size of that dimension.
+
+Dynamic arrays are declared as pointers and use the `new` keyword to dynamically allocate space:
+
+    int *nums = new int[size]; # array of size integers
+    double *scores = new double[numplayers]; # array of numplayers doubles
+
+Multi-dimensional dynamic arrays are arrays of pointers.
+
+Arrays are accessed using their index (starting from 0):
+
+    int list[10];
+    list[0] = 1;
+    list[1] = 2;
