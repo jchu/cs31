@@ -1,0 +1,155 @@
+# Classes
+
+Object-Oriented Programming, or OOP, is one of the major programming paradigm incorporated into C++. OOP, as the name states, is a programming style which centers upon the existence and manipulation of data structures termed as "objects." Objects are data structures that consist of data and functions. A program would create, manipulate, and destroy these objects.
+
+C++ `classes` define these objects by acting as an abstract data type. A `class` defines what kind of data an object will have and the functions associated with those objects. Once defined, a `class` can be treated as a data type for new variables. A variable that has the data type of a `class` is called an `object`, or an `instance` of that class.
+
+[[TOC]]
+
+A `class` contains data, termed as `member variables`, and associated functions, termed` member functions`. Additionally, classes have the concept of `private` data and functions and `public` data and functions. `private` entities can only be used by the object itself. They are hidden internals of the class. `public` entities are the `interface` to the object - how a program interacts with the object.
+    
+## #decl Declaration
+
+A `class` declaration includes the class name, any public and private member functions including optional `constructors`, and private member variables (member variables can be public, but usually not the case). A declaration typically has no implementation details as you can see:
+
+    class ClassName {
+    public:
+        Classname();
+
+        function prototype();
+        function prototype();
+        function prototype();
+
+    private:
+        member variable;
+        member variable;
+        member variable;
+    };
+
+### Constructor
+
+The `constructor` is a special member function that is called when a new object is declared with the class as its data type. It is used to initialize the state of the new object.
+
+All classes come with a `default constructor`. It is a constructor with no arguments and does nothing. The `default constructor` looks like:
+
+    ClassName();
+
+Any other constructors would essentially overload the default constructor, like so:
+
+    ClassName(parameters);
+    ClassName(parameters, parameters);
+
+### Member Functions
+
+Typically, member functions are divided into two types of functions: `accessors` and `mutators`.
+
+`accessors` are `getter` functions; they return parts of the `state` of the object. For simple classes, the `state` of the object is usually represented by the values of the member variables. A more complicated object may have a `state` that is based on calculations on member variables.
+
+`mutators` are `setter` functions; they manipulate the `state` of the object. Again, for simple classes, this would mean simply assigning new values to member variables. More complicated objects might change multiple variables in response.
+
+### Member Variables
+
+Member variables are internal variables to an object. They may or may not represent the `state` of the object directly. They are more directly related to the implementation of the `state`. Thus, typically, member variables are always `private` and accessed via `accessor` methods.
+
+Member variables can be any data type, including the class itself.
+
+### Example
+
+The classic example is the Bank Account. A bank account has a balance and a user can know the current balance, withdraw money, and deposit money.
+
+    class BankAccount {
+    public:
+        BankAccount(double initial_deposit);
+
+        // Accessors
+        double currentBalance();
+
+        // Mutators
+        double withdraw(double amount);
+        void deposit(double amount);
+    private:
+        double balance;
+    };
+
+## #defn Definition
+
+At a glance, the declaration of a class details the contents of the class. The definition of a class contains the implementation of the member functions. A class definition will typically define all the member functions.
+
+### Member Functions
+
+A member function definition is written as:
+
+    return_type ClassName::function_name(parameters) {
+        // body
+    }
+
+Note the `ClassName::`. This declares that the function belongs to the specified classname using `::`, the scope resolution operator.
+
+### Constructors
+
+Constructors are special. They don't have a return type and they can include an `initialization section`, which can be used to automatically initialize member variables.
+
+Default constructor:
+
+    ClassName::ClassName() {
+        // body
+    }
+
+Default constructor with initialization section:
+(membervar0 is an `int` and membervar1 is a `string`)
+
+    ClassName::ClassName() : membervar0(0), membervar1("name") {
+        // body
+    }
+
+Constructor with initialization section:
+
+    ClassName::ClassName(param0, param1)
+                        : membervar0(param0), membervar1(param0) {
+        // body
+    }
+
+If the member variables can be initialized with just the initialization lists, the body of the constructor can be empty.
+
+### Example
+
+Constructor to initialize the balance to 0
+
+    BankAccount::BankAccount() : balance(0)
+    {}
+
+Constructor to initialize the balance given an initial deposit:
+
+    BankAccount::BankAccount(double initial_deposit)
+                            : balance(initial_deposit)
+    {}
+
+## Usage
+
+Now that there is a `class` defined, the `class` can be used for objects like so:
+
+    BankAccount myAccount;  // declare a new variable of the class
+    myAccount = BankAccount(100.0); // initialize using class constructor
+
+    cout << myAccount.balance() << endl; // prints 100
+
+    myAccount.withdraw(20.0);
+    cout << myAccount.balance() << endl; // prints 80
+
+    myAccount.deposit(5.5);
+    cout << myAccount.balance() << endl; // prints 85.5
+
+
+## More Special Functions
+
+### Copy Constructor
+
+The `copy constructor` is a special constructor used when declaring and initializing an object at the same time with another object.
+
+    // Declare a template account that will have $100
+    BankAccount template_account = BankAccount(100.0);
+
+    // Declare myAccount to be initialized based on template
+    BankAccount myAccount(template_account);
+    // my Account has $100
+
