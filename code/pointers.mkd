@@ -1,5 +1,7 @@
 # Pointers
 
+`pointers` are references to data.
+
 [[TOC]]
 
 ## #arr Arrays
@@ -127,3 +129,111 @@ multi-dimensional array:
     }
 
 Note: Arrays can only be returned as their actual manifestation as pointers (discussed later).
+
+## #pointer Pointers
+
+### #decl Declaration
+
+`pointers` are references to other data. In C++, a `pointer` is declared using the `*` character and the data type of the data it points to: `data_type *variable_name`
+
+    double *a; # a is a pointer to a double
+    int *b, *c; # b and c are pointers to integers
+    double d, *e, f; # d and f are doubles; e is a pointer to a double
+
+Note: the `*` is associated with the variable name and not the data type.
+
+When a pointer is declared, it does not point to any data yet. A pointer can point to any data that is already named by another variable using the `reference operator &` or it can point to unnamed data that is dynamically created using the `new` operator.
+
+    int a;
+    int *b = &a; # b is an int pointer pointing to a
+
+    int *c = new int; # c is an int pointer pointing to an unnamed int
+
+Note: While a pointer may point to some data, the data itself may not yet be initialized. (just like arrays)
+
+Additionally, instead of pointing to a single datum, pointers can point to an array of data using the `new` operator.
+
+    int *a = new int[10]; # a points to an array of 10 ints
+
+    int b = 10;
+    int *c = new int[b]; # c points to an array of 10 ints
+
+Note: Because `new` dynamically allocates data, variables can be used to denote the syze of the arrays (unlike regular arrays). Once created, the size of the array is static.
+
+### #basic Basic Usage
+
+`pointers` point to data and are not the data itself. In order to use the data the pointer points to, the `dereference operator *` is used.
+
+    int a = 10;
+    int *b = &a;
+
+    *b = 12; # a now has the value 12
+
+The `dereference operator *` follows the reference of the pointer to the actual data.
+
+Dynamically allocated arrays can be treated as regular arrays:
+
+    int a = new int[10];
+    a[0] = 1;
+    a[1] = 2;
+
+Or can be accessed like regular pointers using `pointer arithmetic`:
+
+    int a = new int[10];
+    *(a + 0) = 1;
+    *(a + 1) = 2;
+
+When an integer is added or substracted to a pointer, it will go to the corresponding location in the array. Note: like static arrays, array values should be initialized before they are used. Read more about `pointer arithmetic` in the Pointer Details section.
+
+### #free Freeing Pointers
+
+Unlike normal variables, dynamically allocated variables via `new` must be destroyed after use to prevent using up memory. Destroying dynamically allocated data is termed `freeing memory`. This is done via `delete`.
+
+    int *a = new int;
+    delete a;   # deletes the integer space and leaves a undefined
+
+    double *b = new double[10];
+    delete[] b;  # deletes the integer array space and leave s b undefined
+
+Note: after deleting the dynamically allocated space, the pointer itself now is undefined and cannot be dereferenced again. Also, the pointer cannot be deleted multiple times.
+
+Freeing memory is especially important when using multi-dimensional pointers (each dimension needs to be freed starting from the deepest one) and pointers within structures and classes (when the struct or objects are no longer needed)
+
+### #param Function Parameters
+
+`call-by-reference` parameters take in pointers as arguments and automatically dereference the argument before binding the argument to the parameter variable.
+
+    bool equals(int& a, int& b) {
+        return a == b; # a, b bound to actual values
+    }
+
+    int a = 0;
+    int b = 1;
+    if( equals(&a, &b) )
+        cout << "a equals b";
+
+On the other hand, pointers can be passed directly as `call-by-value`.
+
+    bool equals(int *a, int *b) {
+        return *a == *b; # a, b are pointers and need to be dereferenced
+    }
+
+    int a = 0;
+    int b = 1;
+    if( equals(&a, &b) )
+        cout << "a equals b";
+
+## #details Pointer Details
+
+`pointers` are actually implemented as memory addresses. On a 32-bit machine, a `pointer` would be a 32-bit number (addressing `2^{32} - 1` addresses), and on a 64-bit machine, a `pointer` would be a 64-bit number (addressing `2^{64} - 1` addresses. Thus, when a `pointer` is declared, the system allocates 32-bits/64-bits of memory to hold an address. Since an memory address is just a number, `pointers` can story any arbitrary number. The validity of the address is determined by the operating system and can only be checked at runtime.
+
+### Dynamically Allocated Data
+
+There are two memory sections used by programs for variables: the `stack` and the `heap`. The `stack` is used to store any static (size known at compilation) variables. These are constants, function parameters, function variables, global variables. The `heap` is used for dynamic (memory allocated during runtime) variables created via `new`.
+
+### Pointer Arithmetic
+
+`pointer arithmetic` is simply translating memory addresses by relative ammounts. `pointers` are associated with a data type: `bool` are 1-byte, `char` are 1-byte, `int` are 4-bytes, etc. When integers are added or subtracted from a `pointer`, they are translated into increments of the data type.
+
+Any arbitrary amount can be added or subtracted from `pointers`. Thus, either the compiler or the operating system are responsibile for ensuring programs do not address data that is not under the control of the program (just like arrays).
+
