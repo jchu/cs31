@@ -94,11 +94,19 @@ Showcases array manipulation
 The game of Black Jack involves:
 
 1. Making a random deck of cards
-2. Dealing cards
+2. Organizing players
 3. User decision or AI
-4. Enforcing Rules
+4. Implementing game actions
 
-### Creating the deck
+The first subsection shows an alternative represention of a deck of cards using a single number of represent both the rank and suit of a card and an array to hold cards. Showcases functions, array manipulation, number representation.
+
+The rest of the subsections are a complete game example using classes, vectors, and pointers. There are 4 objects - a card, a deck, a player, and the game itself.
+
+Showcases classes and objects, multiple compilation, pointers, Makefile.
+
+[blackjack source tarball](blackjack.tar)
+
+### Creating the deck using arrays
 
 Showcases functions, array manipulation, number representation.
 
@@ -250,6 +258,775 @@ Showcases functions, array manipulation, number representation.
         };
     
     }
+
+### game.cpp
+
+An example game of BlackJack. There are two players: the user and the dealer. One round of BlackJack is played.
+
+    #include <iostream>
+    
+    #include "player.h"
+    #include "blackjack.h"
+    
+    using namespace std;
+    
+    
+    int main() {
+        Player* p0 = new Player("p0");
+        Player* dealer = new Player("Dealer");
+    
+        BlackJack game = BlackJack();
+        game.addPlayer(p0);
+        game.addPlayer(dealer);
+    
+        Player* winner;
+        
+        winner = game.playRound();
+    
+        if( winner == NULL )
+            cout << "No winner this round." << endl;
+        else {
+            cout << winner->name() << " won with hand: ";
+            winner->printPrivateHand();
+        }
+    }
+
+### blackjack.h
+
+The `BlackJack` class contains a list of the players and the deck. It also contains the AI strategy for non-user players.
+
+    #ifndef GAME_H
+    #define GAME_H
+    
+    #include <vector>
+    
+    #include "deck.h"
+    #include "player.h"
+    
+    const int HIT = 0;
+    const int FOLD = 1;
+    const int STAY = 2;
+    
+    const int TARGET = 21;
+    
+    class BlackJack {
+    
+    public:
+        BlackJack();
+    
+        /**
+         * Add a new player to the game
+         *
+         * \param Player* Player to add
+         */
+        void addPlayer(Player *p) { players.push_back(p); }
+    
+        /**
+         * Play a single round of BlackJack
+         *
+         * \return Player* Winning player. Can be NULL
+         */
+        Player* playRound();
+    
+        /**
+         * Play a single turn for all players
+         */
+        void playTurn();
+    
+    private:
+    
+        /**
+         * Deal the initial cards to all players
+         */
+        void dealInitial();
+    
+        /**
+         * Prompt player for actions
+         *
+         * \return char Action chosen
+         */
+        char promptChoice(Player *player);
+    
+        /**
+         * Determine if the round is over
+         *
+         * Round ends when there is a winner or everyone
+         * loses.
+         *
+         * \return bool True when round is over
+         */
+        bool roundOver();
+    
+        /**
+         * Find the winner
+         *
+         * \return Player* Winning Player. Can be NULL
+         */
+        Player* winner();
+    
+        /**
+         * Naive strategy
+         *
+         * Hit when value is lower than 13. Stay otherwise.
+         *
+         * Used for non-user players.
+         */
+        char naiveAIStrategy(Player *player);
+    
+        std::vector<Player *> players; // List of players
+        Deck deck; 
+    };
+    
+    #endif
+
+### blackjack.cpp
+
+A single round of BlackJack involves:
+
+1. Dealing the inital 2 cards to each player
+2. For each player, decide on an action (hit or stay)
+3. Act on that action
+4. After each player has made an action, check to see if the game is over
+5. If not, repeat until game over
+
+The `BlackJack` class contains the players and the deck of cards.
+
+
+    /**********************************************************\
+     *
+     * BlackJack
+     *
+     * A single game of BlackJack
+     *
+     * Game Description:
+     *
+     * Players are initially dealt 2 cards. Each turn, a player
+     * can choose to 'hit' to get another card or otherwise
+     * 'stay'. A player's hand has a sum total of the rank of
+     * cards except: All face cards have a value of 10 and the
+     * Ace has either a value of 1 or 11.
+     *
+     * Players compete to get a higher value hand. However, the
+     * maximum value is 21. A player goes 'bust' when their hand
+     * is worth more than 21.
+     *
+     * Class Description:
+     *
+     * BlackJack can accept any number of players via addPlayer.
+     * The first player added is assumed to be the User. All
+     * other players are AI and follow the Naive AI Strategy
+     * (hit when score is < 13, stay otherwise).
+     *
+     * playRound() plays a single round. When the deck is empty,
+     * the game is over.
+     *
+    \**********************************************************/
+    
+    #include <vector>
+    #include <string>
+    #include <iostream>
+    
+    #include "deck.h"
+    #include "player.h"
+    #include "blackjack.h"
+    
+    using namespace std;
+    
+    BlackJack::BlackJack() {
+        deck = Deck();
+        deck.shuffle();
+    }
+    
+    /**
+     * Play a single round of BlackJack
+     *
+     * \return Player* Winning player. Can be NULL
+     */
+    Player* BlackJack::playRound() {
+        dealInitial();
+    
+        if(deck.empty()) {
+            cout << "Deck is empty. Game cannot be played. " << endl;
+            return NULL;
+        }
+    
+        // Overview of inital hands
+    
+        cout << "Your hand: ";
+        players[0]->printPrivateHand();
+        for(unsigned int i = 1; i < players.size(); i++) {
+            cout << "Player " << i << "'s hand: ";
+            players[i]->printPublicHand();
+        }
+    
+        // Play turns
+        while( !roundOver() )
+            playTurn();
+    
+        cout << "Round over!" << endl << endl;
+    
+        return winner();
+    }
+    
+    /**
+     * Play a single turn for all players
+     */
+    void BlackJack::playTurn() {
+        char choice;
+        Card *draw;
+    
+        // Go through each player
+        for(unsigned int i = 0; i < players.size(); i++) {
+            // No more cards!
+            if(deck.empty())
+                return;
+    
+            cout << players[i]->name() << "'s hand: ";
+    
+    
+            // Show hands
+            if( i == 0 )
+                players[i]->printPrivateHand();
+            else
+                players[i]->printPublicHand();
+    
+            // Skip if no actions can be taken
+            if( players[i]->stayed() || players[i]->busted() )
+                continue;
+    
+            // Prompt user for choice or use AI for non-users
+            if( i == 0 )
+                choice = promptChoice(players[i]);
+            else
+                choice = naiveAIStrategy(players[i]);
+    
+            switch(choice) {
+                case 'h':
+                    cout << "Hit me!" << endl;
+                    draw = deck.deal();
+                    cout << players[i]->name() << " drew a ";
+                    draw->print();
+                    cout << endl;
+                    players[i]->addCard(draw);
+                    break;
+                case 's':
+                    cout << "I stay!" << endl;
+                    players[i]->stayHand();
+                    break;
+            };
+    
+            if( players[i]->busted() ) {
+                cout << players[i]->name() << " busted!" << endl;
+            }
+        }
+    }
+    
+    /**
+     * Deal the initial cards to all players
+     *
+     * Each player gets 2 cards
+     */
+    void BlackJack::dealInitial() {
+        for(unsigned int i = 0; i < players.size(); i++) {
+            if(deck.empty())
+                return;
+    
+            players[i]->addCard(deck.deal());
+        }
+        for(unsigned int i = 0; i < players.size(); i++) {
+            if(deck.empty())
+                return;
+    
+            players[i]->addCard(deck.deal());
+        }
+    }
+    
+    /**
+     * Prompt player for actions
+     *
+     * \return char Action chosen
+     */
+    char BlackJack::promptChoice(Player* player) {
+        char choice;
+    
+        do {
+            cout << player->name() << " available actions: (h)it, (s)tay: ";
+            cin >> choice;
+            cout << endl;
+    
+            switch(choice) {
+                case 'h':
+                case 's':
+                    return choice;
+                default:
+                    cout << "Invalid choice" << endl;
+            };
+        } while(true);
+    }
+    
+    /**
+     * Determine if the round is over
+     *
+     * Round ends when there is a winner or everyone
+     * loses or when the deck is empty.
+     *
+     * \return bool True when round is over
+     */
+    bool BlackJack::roundOver() {
+        int playing = players.size();
+    
+        // No more cards!
+        if(deck.empty())
+            return true;
+    
+        for(unsigned int i = 0; i < players.size(); i++) {
+            if( players[i]->stayed() ) // stayed
+                playing--;
+            else if( players[i]->privateTotal() > 21 ) // busted
+                playing--;
+            else if( players[i]->privateTotal() == 21 ) // win
+                return true;
+        }
+    
+        // All payers either stayed or busted
+        if( playing == 0 )
+            return true;
+    
+        return false;
+    }
+    
+    /**
+     * Find the winner
+     *
+     * \return Player* Winning Player. Can be NULL
+     */
+    Player* BlackJack::winner() {
+        Player* winner = NULL;
+        int bestScore = 0;
+        for(unsigned int i = 0; i < players.size(); i++) {
+    
+            // Show final hand
+            cout << players[i]->name() << " (" << players[i]->privateTotal() << "): ";
+            players[i]->printPrivateHand();
+    
+            // Find best score so far
+            if( !players[i]->busted() ) {
+                if( players[i]->privateTotal() > bestScore ) {
+                    bestScore = players[i]->privateTotal();
+                    winner = players[i];
+                }
+            }
+        }
+    
+        return winner;
+    }
+    
+    /**
+     * Naive strategy
+     *
+     * Hit when value is lower than 13. Stay otherwise.
+     *
+     * Used for non-user players.
+     */
+    char BlackJack::naiveAIStrategy(Player *player) {
+        if( player->privateTotal() < 13 )
+            return 'h';
+        return 's';
+    }
+
+### player.h
+
+The `player` class contains a name, a hand of cards, and status variables.
+
+    #ifndef PLAYER_H
+    #define PLAYER_H
+    
+    #include <vector>
+    #include <string>
+    
+    #include "card.h"
+    
+    class Player {
+    public:
+        Player(const char* name) : pname(name), stay(false) {}
+    
+        /**
+         * Add a card to player's hand
+         *
+         * \param Card* Card to add
+         */
+        void addCard(Card *a) { hand.push_back(a); }
+    
+        /**
+         * Reset player's hand and status
+         */
+        void reset() { hand.clear(); stay = false; }
+    
+        void stayHand() { stay = true; }
+    
+        /**
+         * Print hand keeping first 2 cards hidden
+         *
+         * Used for displaying all hands on the table
+         */
+        void printPublicHand();
+    
+        /**
+         * Print hand
+         *
+         * Used for displaying the player's hand
+         */
+        void printPrivateHand();
+    
+        bool stayed() { return stay; }
+        bool busted() { return privateTotal() > 21; }
+    
+        std::string name() { return pname; }
+    
+        /**
+         * Calculate value of hand including hidden cards
+         */
+        int privateTotal();
+    
+    private:
+        std::string pname;
+        std::vector<Card*> hand;
+        bool stay;
+    };
+    
+    #endif
+
+### player.cpp
+
+Implementation of the `player` class.
+
+    #include <iostream>
+    
+    #include "card.h"
+    #include "player.h"
+    
+    using namespace std;
+    
+    void Player::printPublicHand() {
+        cout << "XX XX ";
+        for(unsigned int i = 2; i < hand.size(); i++ ) {
+            hand[i]->print();
+            cout << " ";
+        }
+        cout << endl;
+    }
+    
+    void Player::printPrivateHand() {
+        for(unsigned int i = 0; i < hand.size(); i++ ) {
+            hand[i]->print();
+            cout << " ";
+        }
+        cout << endl;
+    }
+    
+    /**
+     * Calculate value of hand including hidden cards
+     */
+    int Player::privateTotal() {
+        if( hand.size() < 2 )
+            return -1;
+    
+        int sum = 0;
+        int numAces = 0;
+        for(unsigned int i = 0; i < hand.size(); i++ ) {
+            if( *hand[i] == 1 )
+                numAces++;
+            else
+                sum += *hand[i];
+        }
+        
+        int tempSum;
+        for(int j = numAces; j >= 0; j--) {
+            tempSum = sum + (j * 11) + (numAces - j);
+            if(tempSum <= 21)
+                return tempSum;
+        }
+        return sum;
+    }
+
+### deck.h
+
+The `deck` class contains the cards in the deck.
+
+    #ifndef DECK_H
+    #define DECK_H
+    
+    #include "card.h"
+    
+    const int DECK_SIZE = 52;
+     
+    class Deck {
+    public:
+        Deck();
+    
+        /** 
+         * Shuffle deck
+         *
+         * Shuffle the entire deck
+         */
+        void shuffle();
+        
+        /**
+         * Deal the topmost card
+         *
+         * Remove and return the topmost card
+         *
+         * \return Card* Card dealt. Can be NULl
+         */
+        Card *deal();
+        bool empty() { return size == 0; }
+    
+        void print();
+    
+    private:
+    
+        /** 
+         * Shuffle deck
+         *
+         * \param size  size of deck left to shuffle
+         */
+        void shuffle(int shufflesize);
+    
+        /**
+         * Swap any pair of cards in the deck
+         *
+         * \param posA     A card position
+         * \param posB     Another card position
+         */
+        void swap_cards(int posA, int posB);
+    
+        Card *deck[DECK_SIZE]; // deck of Card pointers
+        int size; // number of cards in deck
+    };
+
+    #endif
+
+### deck.cpp
+
+Implementation fo the `deck` class.
+
+    #include <iostream>
+    #include <cstdlib>
+    #include <ctime>
+    
+    #include "card.h"
+    #include "deck.h"
+    
+    Using namespace std;
+    
+    /**
+     * Initialize a completely ordered deck
+     */
+    Deck::Deck() : size(DECK_SIZE) {
+        for(int i = 0; i < size; i++) {
+            int rank = (i % 13) + 1;
+            int suit = i / 13;
+            deck[i] = new Card(rank, suit);
+        }
+        srand(time(0));
+    }
+    
+    /** 
+     * Shuffle deck
+     *
+     * Shuffle the entire deck
+     */
+    Void Deck::shuffle() {
+        if( size == 0 )
+            return;
+        int i = rand() % size;
+        swap_cards(i, size - 1);
+        shuffle(size - 1);
+    }
+    
+    /**
+     * Deal the topmost card
+     *
+     * Remove and return the topmost card
+     *
+     * \return Card* Card dealt. Can be NULL.
+     */
+    Card* Deck::deal() {
+        if( size - 1 < 0 )
+            return NULL;
+    
+        Card* top = deck[size - 1];
+        size--;
+        return top;
+    }
+    
+    /** 
+     * Shuffle deck
+     *
+     * \param size  size of deck left to shuffle
+     */
+    Void Deck::shuffle(int shufflesize) {
+        if( shufflesize != 0 ) {
+            int i = rand() % shufflesize;
+            swap_cards(i, shufflesize - 1);
+            shuffle(shufflesize - 1);
+        }
+    }
+     
+     
+    /**
+     * Swap any pair of cards in the deck
+     *
+     * \param posA     A card position
+     * \param posB     Another card position
+     */
+    Void Deck::swap_cards(int posA, int posB) {
+        if( posA != posB ) {
+            Card *temp = deck[posB];
+            deck[posB] = deck[posA];
+            deck[posA] = temp;
+        }
+    }
+    
+    /**
+     * Print out cards in the deck
+     */
+    Void Deck::print() {
+        for(int i = 0; i < size; i++ ) {
+            if(i % 13 == 0)
+                cout << endl;
+            deck[i]->print();
+            cout << "\t";
+        }
+        cout << endl;
+    }
+
+### card.h
+
+A `card` is a suit and a rank. Face cards have value 10.
+
+    #ifndef CARD_H
+    #define CARD_H
+    
+    class Card {
+    public:
+        Card(int new_rank, int new_suit);
+    
+        void print();
+    
+        // Overload type cast to integer
+        operator int() {
+    
+            // Face values have value 10
+            if( rank > 10 )
+                return 10;
+    
+            return rank;
+        }
+    
+    private:
+        int rank; // 1 - 13
+        int suit; // H, S, D, C
+    };
+
+    #endif
+
+### card.cpp
+
+Implementation of the `card` class.
+
+    #include <iostream>
+    
+    #include "card.h"
+    
+    using namespace std;
+    
+    /**
+     * Constructor
+     *
+     * Initialize rank and suit
+     */
+    Card::Card(int new_rank, int new_suit)
+        : rank(new_rank), suit(new_suit) {}
+    
+    /**
+     * Print out a card
+     */
+    void Card::print() {
+        switch(rank) {
+            case 1:
+                cout << "A";
+                break;
+            case 11:
+                cout << "J";
+                break;
+            case 12:
+                cout << "Q";
+                break;
+            case 13:
+                cout << "K";
+                break;
+            default:
+                cout << rank;
+                break;
+        };
+     
+        switch(suit) {
+            case 0:
+                cout << "H";
+                break;
+            case 1:
+                cout << "S";
+                break;
+            case 2:
+                cout << "D";
+                break;
+            case 3:
+                cout << "C";
+                break;
+        };
+    }
+
+### Makefile
+
+Makefile to compile the program using GNU Make.
+
+    CC=g++
+    CFLAGS=-g -Wall
+    COMPILE=$(CC) $(CFLAGS)
+    
+    OBJECTS=card.o deck.o player.o blackjack.o
+    
+    all: game
+    
+    card.o: card.h card.cpp
+    	$(COMPILE) -c card.cpp
+    
+    deck.o: deck.h deck.cpp
+    	$(COMPILE) -c deck.cpp
+    
+    player.o: player.h player.cpp
+    	$(COMPILE) -c player.cpp
+    
+    blackjack.o: blackjack.h blackjack.cpp
+    	$(COMPILE) -c blackjack.cpp
+    
+    game: card.o deck.o player.o blackjack.o game.cpp
+    	$(COMPILE) $(OBJECTS) -o game game.cpp
+    
+    clean:
+    	rm -f $(OBJECTS) game
+
+With this Makefile, just run `make && ./game`.
+
+Explicit commands using `g++`:
+
+    g++ -c card.cpp
+    g++ -c deck.cpp
+    g++ -c player.cpp
+    g++ -c blackjack.cpp
+    g++ card.o deck.o player.o blackjack.o -o game game.cpp
+    ./game
 
 ## #pong Pong
 
