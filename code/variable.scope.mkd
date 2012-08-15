@@ -6,7 +6,7 @@ Scopes define where variables are defined and accessible at any point in a progr
 
 ## Scopes
 
-Variables are always declared in some scope. Variables cannot be declared twice within the same scope. When variables are declared in different scopes, the most restrictive scope is used when evaluating a variable.
+Variables are always declared in some scope. Variables cannot be declared twice within the same scope. When a scope is made within another scope (e.g. a function declared within the global scope, a block scope made within a function scope), the scopes are `nested` as `parent` or `outer` scope and `child` or `inne` scopes. The child scope has access to the parent scope variables. When variables are declared with the same name in nested scopes, the most restrictive scope is used when evaluating a variable. 
 
 ### Global Scope
 
@@ -71,3 +71,77 @@ A `block` is a section of code denoted by `{}`. This includes function, control 
         b ^= a;
         a ^= b;
     }
+
+## Scope Implementation
+
+Variable scopes are implemented by partitioning memory and preventing access to variables that belong to different memory partitions. Here is high-level visualization of the scopes in the previous example:
+
+    .gv
+    node [shape=record];
+    rankdir=LR;
+    compound=true;
+
+    subgraph cluster_0 {
+        label=<<B>Global Scope</B>>;
+        style=filled;
+        color=yellow;
+
+        globalScope [ label="int global | <fmain> function:main scope | <fsubtract> function:subtract scope | <fswap> function:swap scope", fillcolor=yellow];
+    }
+
+    subgraph cluster_1 {
+        label=<<B>function:main scope</B>>;
+        style=filled;
+        color=green;
+
+        mainScope [ label="int a | int b | <bfor0> block:for scope | <bwhile> block:while scope | <bfor1> block:for scope"];
+    }
+
+    subgraph cluster_2 {
+        label=<<B>function:subtract scope</B>>;
+        style=filled;
+        color=green;
+        
+        subtractScope [ label="int a | int b", fillcolor=green ];
+    }
+
+    subgraph cluster_3 {
+        label=<<B>function:swap scope</B>>;
+        style=filled;
+        color=green;
+
+        swapScope [ label="int a (by ref) | int b (by ref)"];
+    }
+
+    subgraph cluster_4 {
+        label=<<B>block:for scope</B>>;
+        style=filled;
+        color=magenta;
+
+        forScope0 [ label="block:for scope | int a" ];
+    }
+
+    subgraph cluster_5 {
+        label=<<B>block:while scope</B>>;
+        style=filled;
+        color=magenta;
+
+        whileScope [ label="block:while scope | int a" ];
+    }
+
+    subgraph cluster_6 {
+        label=<<B>block:for scope</B>>;
+        style=filled;
+        color=magenta;
+
+        forScope1 [ style=invis ];
+    }
+
+    globalScope:fmain -> mainScope [style=dashed, dir=none, lhead=cluster_1];
+    globalScope:fsubtract -> subtractScope [style=dashed, dir=none, lhead=cluster_2];
+    globalScope:fswap -> swapScope [style=dashed, dir=none, lhead=cluster_3];
+    mainScope:bfor0 -> forScope0 [style=dashed, dir=none, lhead=cluster_4];
+    mainScope:bwhile -> whileScope [style=dashed, dir=none, lhead=cluster_5];
+    mainScope:bfor1 -> forScope1 [style=dashed, dir=none, lhead=cluster_6];
+
+Remember, a child scope also has access to variables in the parent scopes.
