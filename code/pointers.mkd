@@ -102,11 +102,11 @@ And they can be initialized like normal arrays:
 
 ### #arrparam Function Parameters
 
-Arrays are different from regular variables when passed as arguments to functions. They can only be used in `pass-by-reference`. There is no way to automatically pass an entire array copy to a function. One way around this is to manually copy the array to a new array variable and pass that new array as a function argument. 
+Arrays are different from regular variables when passed as arguments to functions. They can only be used in `pass-by-reference`. There is no way to automatically pass an entire array copy to a function. One way around this is to manually copy the array to a new array variable and pass that new array as a function argument.
 
 Furthermore, there is no way to automatically determine the size of an array as a paremeter. The size must be another argument to the function. There is a caveat for multidimensional arrays. While the first dimension's size cannot be predetermined, all the other dimensions must be specified.
 
-single dimensional array: 
+single dimensional array:
 
     void initialize_array(int[], int);
 
@@ -235,5 +235,135 @@ There are two memory sections used by programs for variables: the `stack` and th
 
 `pointer arithmetic` is simply translating memory addresses by relative ammounts. `pointers` are associated with a data type: `bool` are 1-byte, `char` are 1-byte, `int` are 4-bytes, etc. When integers are added or subtracted from a `pointer`, they are translated into increments of the data type.
 
-Any arbitrary amount can be added or subtracted from `pointers`. Thus, either the compiler or the operating system are responsibile for ensuring programs do not address data that is not under the control of the program (just like arrays).
+Any arbitrary amount can be added or subtracted from `pointers`. Thus, either the compiler or the operating system are responsible for ensuring programs do not address data that is not under the control of the program (just like arrays).
 
+### #viz Visualization
+
+Memory can be represented as a contiguous block of bytes in memory. Each byte of memory is addressable by a number. The size of the memory address (whether it is 32-bits or 64-bits) determines how much memory can be addressed in the system. 
+
+    .gv
+    rankdir=LR;
+    concentrate=true;
+    
+    subgraph cluster_0 {
+        style=filled;
+        color=green;
+
+        memory [shape=record, label="{ memory address | data } | {{ high | ~ | ~ } | heap } | {{ ~ | ~ |~  | ~ } | } | { { ~ | ~ | low } | stack }", fixedsized=true, width=3 ]; 
+    }
+
+The `heap` holds dynamically allocated data declared with `new`. It starts from high in memory and grows down. The `stack` holds statically allocated data and grows up. Each program has their own section of memory and their own set of `stack` and `heap`. The program runs out of memory when the `heap` and the `stack` collide.
+
+Note: In the following examples, the actual memory addresses are only examples. 
+
+#### Statically Allocated  Data
+These declarations are used in the following visualization.
+
+    int a;
+    bool flag;
+    int *num = &a;
+    bool *flagPtr = &flag;
+
+In this visualization, the memory address locations are in the left column, while the data is in the right column. Each row represents a single byte of memory. The boolean `flag` is 1 byte. The integer `a` is 4 bytes. Since a memory location is addressable by an integer, the two pointers `num` and `flagPtr` are also 4 bytes long. They both contain the address location of the variable they point to.
+
+    .gv
+    rankdir=LR;
+    concentrate=true;
+    node [shape=none]
+
+    a
+    flag
+    flagPtr
+    num
+    
+    subgraph cluster_0 {
+        style=filled;
+        color=green;
+
+        memory [shape=record, label="{ memory address | data } | {{ high | ~ | 1048587 } | } | {{1048586 | | | <intp> 1048585 } | <intpv> int* } | {{1048582 | | | <boolp> 1048581} | <boolpv> bool*} | { <bool> 1048580 | bool } | { { 1048579 | | | <inta> 1048576 } | <int> int} | {{1048575 | ~ | low } | }", fixedsized=true, width=3 ]; 
+    }
+
+    memory:intpv -> memory:inta;
+    memory:boolpv -> memory:bool;
+
+    num -> memory:intp [minlen=3];
+    flagPtr -> memory:boolp [minlen=3];
+    flag -> memory:bool [minlen=3];
+    a -> memory:inta [minlen=3];
+
+    .eq num flag a flagPtr
+
+    .ie num .. flagPtr
+    .ie flagPtr .. flag
+    .ie flag .. a
+
+The variable names (shown on the left) identify the data. Pointers have their own memory space to hold the memory address of the data they point to.
+
+Static arrays simply allocate multiple contiguous regions in memory to hold the data. While the name itself isn't a real pointer, it can act as as a pointer in order to address data in the array.
+
+    int nums[3];
+
+Looks like:
+
+    .gv
+    rankdir=LR;
+    concentrate=true;
+    node [shape=none]
+
+    subgraph cluster_0 {
+        style=filled;
+        color=green;
+
+        memory [shape=record, label="{ memory address | data } | {{ high | ~ | 1048589 } | } | { { 1048588 | | | <intp2> 1048585 } | int } | { { 1048584 | | | <intp1> 1048581 } | int } |  { { 1048580 | | | <intp0> 1048576 } | int} | {{1048575 | ~ | low } | }", fixedsized=true, width=3 ]; 
+    }
+
+    "nums[2] or *nums+2" -> memory:intp2 [minlen=3];
+    "nums[1] or *nums+1" -> memory:intp1 [minlen=3];
+    "nums[0] or *nums+0" -> memory:intp0 [minlen=3];
+
+    .eq "nums[2] or *nums+2" "nums[1] or *nums+1" "nums[0] or *nums+0"
+
+    .ie "nums[2] or *nums+2" .. "nums[1] or *nums+1"
+    .ie "nums[1] or *nums+1" .. "nums[0] or *nums+0"
+
+#### Dynamically Allocated Data
+
+Dynamically allocated data do not have identifiers attached to them (though they can be assigned later). They are only referenced by pointers. The pointer itself is in the `stack` while the allocated memory is in the `heap`
+
+    int a = new int;
+    bool *answers = new bool[5];
+
+Looks like:
+
+    .gv
+    rankdir=LR;
+    concentrate=true;
+    node [shape=none]
+
+    subgraph cluster_0 {
+        style=filled;
+        color=green;
+
+        memory [shape=record, label="{ memory address | data } | {{ high | ~ | 1048585 } | } | { { 1048584 | | | <inta> 1048581 } | int } | { <boolp4> 1048580 | bool } | { <boolp3> 1048579 | bool } | { <boolp2> 1048578 | bool } | { <boolp1> 1048577 | bool } |  { <boolp0> 1048576 | bool} | {{1048575 | ~ | ~ | ~ | 524292 } | } | { { 524291 | | | <boolp> 524288 } | <boolpv> bool* } | { { 524287 | | | <intp> 524284 } | <intpv> int* } | { { 524283 | ~ | low } | }", fixedsized=true, width=3 ]; 
+    }
+
+    "answers[4] or *answers+4" -> memory:boolp4 [minlen=3];
+    "answers[3] or *answers+3" -> memory:boolp3 [minlen=3];
+    "answers[2] or *answers+2" -> memory:boolp2 [minlen=3];
+    "answers[1] or *answers+1" -> memory:boolp1 [minlen=3];
+    "answers[0] or *answers+0" -> memory:boolp0 [minlen=3];
+    a -> memory:intp [minlen=3]
+
+
+    .eq "answers[4] or *answers+4" "answers[3] or *answers+3" "answers[2] or *answers+2" "answers[1] or *answers+1" "answers[0] or *answers+0" answers a
+
+    .ie "answers[4] or *answers+4" ..  "answers[3] or *answers+3"
+    .ie "answers[3] or *answers+3" ..  "answers[2] or *answers+2"
+    .ie "answers[2] or *answers+2" ..  "answers[1] or *answers+1"
+    .ie "answers[1] or *answers+1" ..  "answers[0] or *answers+0"
+    .ie "answers[0] or *answers+0" ..  answers
+    .ie answers -> a
+
+    answers -> memory:boolp [minlen=3]
+    memory:boolpv -> memory:boolp0
+    memory:intpv -> memory:inta
