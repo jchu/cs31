@@ -10,7 +10,7 @@ The following are some IRC clients.
 
 [mibbit](chat.mibbit.com) is a javascript web client.
 
-Connect to the server by clicking on server and filling in `irc.caffeinatedcode.com+61697`. Choose a nick and the channel `#cs31`. Chat away.
+Connect to the server by clicking on server and filling in `server+port`. Choose a nick and the channel. Chat away.
 
 ## irssi (\*nix)
 
@@ -18,11 +18,7 @@ irssi is a \*nix text-only IRC client. The basic interface is simple.
 
     /server [options] hostname [port]
 
-Connect to the server at hostname and port. For example,
-
-    /server -ssl irc.caffeinatedcode.com 61697
-
-This connects to the irc server irc.caffeinatedcode.com on port 61697 with an ssl enabled.
+Connect to the server at hostname and port.
 
 After connecting, simply join a channel:
 
@@ -54,8 +50,8 @@ Follow this guide for more details: [A Guide to Efficiently Using Irssi and Scre
     * Nickname
   * Servers
     * Description
-    * IRC Server (irc.caffeinatedcode.com)
-    * Ports (61697)
+    * IRC Server
+    * Ports
     * Select
 
 ## mac clients
